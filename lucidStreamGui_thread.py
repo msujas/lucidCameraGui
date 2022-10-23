@@ -210,7 +210,7 @@ class Worker(QtCore.QThread):
 		
 class Ui_MainWindow(object):
 	def setupUi(self, MainWindow):
-		MainWindow.setObjectName("MainWindow")
+		MainWindow.setObjectName("Lucid GUI")
 		MainWindow.resize(264, 559)
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
 		self.centralwidget.setObjectName("centralwidget")
@@ -344,25 +344,32 @@ class Ui_MainWindow(object):
 
 		self.retranslateUi(MainWindow)
 		QtCore.QMetaObject.connectSlotsByName(MainWindow)
-		self.running = True
+
 		self.runButton.clicked.connect(self.start_worker)
 		self.stopButton.clicked.connect(self.stop_worker)
 	def retranslateUi(self, MainWindow):
 		_translate = QtCore.QCoreApplication.translate
-		MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+		MainWindow.setWindowTitle(_translate("MainWindow", "Lucid GUI"))
 		self.runButton.setText(_translate("MainWindow", "Let\'s gooooo!"))
 		self.xResLabel.setText(_translate("MainWindow", "x-resolution"))
+		self.xResLabel.adjustSize()
 		self.yResLabel.setText(_translate("MainWindow", "y-resolution"))
+		self.yResLabel.adjustSize()
 		self.xOffsetLabel.setText(_translate("MainWindow", "x-offset"))
 		self.yOffsetLabel.setText(_translate("MainWindow", "y-offset"))
 		self.monitorxLabel.setText(_translate("MainWindow", "x image size on screen"))
+		self.monitorxLabel.adjustSize()
 		self.monitoryLabel.setText(_translate("MainWindow", "y image size on screen"))
+		self.monitoryLabel.adjustSize()
 		self.aspectInfoLabel.setText(_translate("MainWindow", "aspect ratio of image on screen will be\n"
 "scaled automatically"))
+		self.aspectInfoLabel.adjustSize()
 		self.gainAutoLabel.setText(_translate("MainWindow", "Gain Auto"))
+		self.gainAutoLabel.adjustSize()
 		self.gainLabel.setText(_translate("MainWindow", "Gain (set Gain\n"
 "Auto to \'Off\')"))
 		self.manualFPSLabel.setText(_translate("MainWindow", "Manual FPS"))
+		self.manualFPSLabel.adjustSize()
 		self.FPSLabel.setText(_translate("MainWindow", "FPS"))
 		self.stopButton.setText(_translate("MainWindow", "Stop"))
 	def start_worker(self):
@@ -386,22 +393,6 @@ class Ui_MainWindow(object):
 	def stop_worker(self):
 		self.thread.stop()
 		self.runButton.setEnabled(True)
-	def launch(self):
-		width = self.xResBox.value()
-		height = self.yResBox.value()
-		ox = self.xOffsetBox.value()
-		oy = self.yOffsetBox.value()
-		monitorx = self.monitorxBox.value()
-		monitory = self.monitoryBox.value()
-		if self.manualFPSBox.currentText() == 'True':
-			manualfps = True
-		elif self.manualFPSBox.currentText() == 'False':
-			manualfps = False
-		fps = self.FPSBox.value()
-		gainAuto = self.gainAutoBox.currentText()
-		gain = self.gainBox.value()
-		lucidLiveStream.run(width = width,height = height,ox = ox,oy = oy, monitorx = monitorx,monitory = monitory,
-		manualfps = manualfps,fps = fps,gainAuto = gainAuto,gain = gain,running = self.running)
 
 
 if __name__ == "__main__":
