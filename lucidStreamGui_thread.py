@@ -66,13 +66,13 @@ class Worker(QtCore.QThread):
 		'YCbCr8_CbYCr':3, 'YUV422_8':3, 'YUV422_8_UYVY':3, 'YCbCr411_8':3, 'YUV411_8_UYYVYY':3}
 	
 	
-		if self.ox > 4096 - width:
+		if self.ox > 4096 - self.width:
 			print('OffsetX is too large for resolution used; it must be less than or equal to\n'
 				'4096 (max. res.) - set resolution\n'
 				'exiting')
 			return
 	
-		if self.oy > 3000 - height:
+		if self.oy > 3000 - self.height:
 			print('OffsetY is too large for resolution used; it must be less than or equal to\n'
 					'3000 (max. res.) - set resolution\n'
 					'exiting')
@@ -94,8 +94,8 @@ class Worker(QtCore.QThread):
 		nodes['OffsetX'].value = self.ox
 		nodes['OffsetY'].value = self.oy
 		nodes['GainAuto'].value = self.gainAuto
-		if not gainAuto:
-			nodes['Gain'] = float(self.gain)
+		if self.gainAuto == 'Off': 
+			nodes['Gain'] = self.gain
 	
 	
 		nodes['PixelFormat'].value = self.fmt
