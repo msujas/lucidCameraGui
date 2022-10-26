@@ -128,7 +128,7 @@ class Worker(QtCore.QThread):
 		cycletimes = np.array([])
 		textpos = (np.uint16(7*self.monitorx/1920), np.uint16(70*self.monitory/1080))
 		textsize = 3*self.monitorx/1920
-
+		print(f'monitorx {monitorx}, monitory {monitory}')
 		with device.start_stream():
 			"""
 			Infinitely fetch and display buffer data until esc is pressed
@@ -196,10 +196,7 @@ class Worker(QtCore.QThread):
 		#print(1/np.average(buffertimes))
 		cycletimes = cycletimes[1:]
 		print(f'fps = {1/np.average(cycletimes)}, standard deviation = {np.std(1/cycletimes)}')
-		plt.plot(1/cycletimes)
-		plt.ylabel('fps')
-		plt.xlabel('frame')
-		plt.show()
+		return
 		
 	def stop(self):
 		self.running = False
