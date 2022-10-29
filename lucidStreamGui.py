@@ -19,7 +19,7 @@ import time
 import matplotlib.pyplot as plt
 
 class Worker(QtCore.QThread):
-	def __init__(self,width, height, ox, oy,monitorx, monitory,manualfps,fps, gainAuto, gain, fmt):
+	def __init__(self,width, height, ox, oy,monitorx, monitory,manualfps,fps, gainAuto, gain, fmt, screenwidth):
 		super(Worker,self).__init__()
 		self.width = width
 		self.height = height
@@ -32,6 +32,7 @@ class Worker(QtCore.QThread):
 		self.fps = fps
 		self.gainAuto = gainAuto
 		self.gain = gain
+		self.screenwidth = screenwidth
 		self.running = True
 	def run(self):
 		tries = 0
@@ -129,6 +130,9 @@ class Worker(QtCore.QThread):
 		textpos = (np.uint16(7*self.monitorx/1920), np.uint16(70*self.monitory/1080))
 		textsize = 3*self.monitorx/1920
 		print(f'monitorx {monitorx}, monitory {monitory}')
+		windowName = 'Lucid (press stop to close)'
+		cv2.namedWindow(windowName)
+		cv2.moveWindow(windowName,self.screenwidth-monitorx,0)
 		with device.start_stream():
 			"""
 			Infinitely fetch and display buffer data until esc is pressed
@@ -171,7 +175,7 @@ class Worker(QtCore.QThread):
 
 				cv2.putText(resize, fps,textpos, cv2.FONT_HERSHEY_SIMPLEX, textsize, (100, 255, 0), 3, cv2.LINE_AA)
 	
-				cv2.imshow('lucid (press Esc. to close)',resize)
+				cv2.imshow(windowName,resize)
 
 				"""
 				Destroy the copied item to prevent memory leaks
@@ -208,127 +212,156 @@ class Worker(QtCore.QThread):
 class Ui_MainWindow(object):
 	def setupUi(self, MainWindow):
 		MainWindow.setObjectName("Lucid GUI")
-		MainWindow.resize(280, 597)
+		
+		self.screen = QtWidgets.QApplication.primaryScreen().size()
+		self.screenwidth = self.screen.width()
+		scaling = self.screenwidth/1920
+		windowsize = [int(280*scaling),int(600*scaling)]
+		MainWindow.resize(*windowsize)
+		box1pos = [int(20*scaling), int(40*scaling)]
+		boxDimensions = [int(80*scaling),int(22*scaling)]
+		boxOffset = boxDimensions[1] + int(18*scaling)		
+		
+		basefont = int(12*scaling)
+		
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
 		self.centralwidget.setObjectName("centralwidget")
 		self.runButton = QtWidgets.QPushButton(self.centralwidget)
-		self.runButton.setGeometry(QtCore.QRect(20, 510, 130, 41))
+		self.runButton.setGeometry(QtCore.QRect(20, 12*boxOffset + box1pos[1], 130, 41))
+		
 		font = QtGui.QFont()
-		font.setPointSize(12)
+		font.setPointSize(basefont)
+		boxfont = QtGui.QFont()
+		boxfont.setPointSize(basefont-4)
+		labelfont = QtGui.QFont()
+		labelfont.setPointSize(basefont-4)	
+		smallLabelfont = QtGui.QFont()
+		smallLabelfont.setPointSize(basefont-5)	
+
+		
+		
 		self.runButton.setFont(font)
 		self.runButton.setObjectName("runButton")
 		self.yOffsetBox = QtWidgets.QSpinBox(self.centralwidget)
-		self.yOffsetBox.setGeometry(QtCore.QRect(20, 140, 81, 22))
+		self.yOffsetBox.setGeometry(QtCore.QRect(20, 3*boxOffset + box1pos[1],*boxDimensions))
 		self.yOffsetBox.setMaximum(2950)
 		self.yOffsetBox.setObjectName("yOffsetBox")
 		self.xOffsetBox = QtWidgets.QSpinBox(self.centralwidget)
-		self.xOffsetBox.setGeometry(QtCore.QRect(20, 110, 81, 22))
+		self.xOffsetBox.setGeometry(QtCore.QRect(20, 2*boxOffset + box1pos[1],*boxDimensions))
 		self.xOffsetBox.setMaximum(4046)
 		self.xOffsetBox.setObjectName("xOffsetBox")
 		self.yResBox = QtWidgets.QSpinBox(self.centralwidget)
-		self.yResBox.setGeometry(QtCore.QRect(20, 80, 81, 22))
+		self.yResBox.setGeometry(QtCore.QRect(20, boxOffset + box1pos[1],*boxDimensions))
 		self.yResBox.setMinimum(50)
 		self.yResBox.setMaximum(3000)
 		self.yResBox.setProperty("value", 3000)
 		self.yResBox.setObjectName("yResBox")
 		self.xResBox = QtWidgets.QSpinBox(self.centralwidget)
-		self.xResBox.setGeometry(QtCore.QRect(20, 40, 81, 22))
+		self.xResBox.setGeometry(QtCore.QRect(20, 40,*boxDimensions))
 		self.xResBox.setMinimum(50)
 		self.xResBox.setMaximum(4096)
 		self.xResBox.setProperty("value", 4000)
 		self.xResBox.setObjectName("xResBox")
+		
+		self.xResLabel = QtWidgets.QLabel(self.centralwidget)
+		self.xResLabel.setGeometry(QtCore.QRect(120, 40, 61, 16))
+		self.xResLabel.setObjectName("xResLabel")
+		
+		self.yResLabel = QtWidgets.QLabel(self.centralwidget)
+		self.yResLabel.setGeometry(QtCore.QRect(120, boxOffset + box1pos[1], 71, 16))
+		self.yResLabel.setObjectName("yResLabel")
+		
 		self.monitorxBox = QtWidgets.QSpinBox(self.centralwidget)
-		self.monitorxBox.setGeometry(QtCore.QRect(20, 200, 81, 22))
+		self.monitorxBox.setGeometry(QtCore.QRect(20, 4*boxOffset + box1pos[1],*boxDimensions))
 		self.monitorxBox.setMinimum(100)
 		self.monitorxBox.setMaximum(2560)
 		self.monitorxBox.setStepType(QtWidgets.QAbstractSpinBox.DefaultStepType)
 		self.monitorxBox.setProperty("value", 2500)
 		self.monitorxBox.setObjectName("monitorxBox")
-		self.xResLabel = QtWidgets.QLabel(self.centralwidget)
-		self.xResLabel.setGeometry(QtCore.QRect(120, 40, 61, 16))
-		self.xResLabel.setObjectName("xResLabel")
-		self.yResLabel = QtWidgets.QLabel(self.centralwidget)
-		self.yResLabel.setGeometry(QtCore.QRect(120, 80, 71, 16))
-		self.yResLabel.setObjectName("yResLabel")
+
 		self.xOffsetLabel = QtWidgets.QLabel(self.centralwidget)
-		self.xOffsetLabel.setGeometry(QtCore.QRect(120, 110, 47, 13))
+		self.xOffsetLabel.setGeometry(QtCore.QRect(120, 2*boxOffset + box1pos[1], 47, 13))
 		self.xOffsetLabel.setObjectName("xOffsetLabel")
+		
 		self.yOffsetLabel = QtWidgets.QLabel(self.centralwidget)
-		self.yOffsetLabel.setGeometry(QtCore.QRect(120, 140, 47, 20))
+		self.yOffsetLabel.setGeometry(QtCore.QRect(120, 3*boxOffset + box1pos[1], 47, 20))
 		self.yOffsetLabel.setObjectName("yOffsetLabel")
+		
 		self.monitorxLabel = QtWidgets.QLabel(self.centralwidget)
-		self.monitorxLabel.setGeometry(QtCore.QRect(110, 200, 111, 16))
+		self.monitorxLabel.setGeometry(QtCore.QRect(110, 4*boxOffset + box1pos[1], 111, 16))
 		self.monitorxLabel.setObjectName("monitorxLabel")
+		
 		self.monitoryLabel = QtWidgets.QLabel(self.centralwidget)
-		self.monitoryLabel.setGeometry(QtCore.QRect(110, 240, 111, 16))
+		self.monitoryLabel.setGeometry(QtCore.QRect(110, 5*boxOffset + box1pos[1], 111, 16))
 		self.monitoryLabel.setObjectName("monitoryLabel")
+		
 		self.monitoryBox = QtWidgets.QSpinBox(self.centralwidget)
-		self.monitoryBox.setGeometry(QtCore.QRect(20, 240, 81, 22))
+		self.monitoryBox.setGeometry(QtCore.QRect(20, 5*boxOffset + box1pos[1],*boxDimensions))
 		self.monitoryBox.setMinimum(100)
 		self.monitoryBox.setMaximum(3000)
 		self.monitoryBox.setSingleStep(1)
 		self.monitoryBox.setStepType(QtWidgets.QAbstractSpinBox.DefaultStepType)
 		self.monitoryBox.setProperty("value", 1300)
 		self.monitoryBox.setObjectName("monitoryBox")
+		
 		self.aspectInfoLabel = QtWidgets.QLabel(self.centralwidget)
-		self.aspectInfoLabel.setGeometry(QtCore.QRect(20, 265, 201, 41))
-		font = QtGui.QFont()
-		font.setPointSize(7)
-		self.aspectInfoLabel.setFont(font)
+		self.aspectInfoLabel.setGeometry(QtCore.QRect(20, int(5.7*boxOffset + box1pos[1]), 201, 41))
+		self.aspectInfoLabel.setFont(smallLabelfont)
 		self.aspectInfoLabel.setObjectName("aspectInfoLabel")
+		
 		self.gainAutoBox = QtWidgets.QComboBox(self.centralwidget)
-		self.gainAutoBox.setGeometry(QtCore.QRect(20, 430, 91, 22))
-		font = QtGui.QFont()
-		font.setPointSize(10)
-		self.gainAutoBox.setFont(font)
+		self.gainAutoBox.setGeometry(QtCore.QRect(20, 10*boxOffset + box1pos[1], boxDimensions[0] + int(10*scaling), boxDimensions[1]))
 		self.gainAutoBox.setObjectName("gainAutoBox")
+		
 		self.gainAutoLabel = QtWidgets.QLabel(self.centralwidget)
-		self.gainAutoLabel.setGeometry(QtCore.QRect(120, 430, 61, 16))
-		font = QtGui.QFont()
-		font.setPointSize(10)
-		self.gainAutoLabel.setFont(font)
+		self.gainAutoLabel.setGeometry(QtCore.QRect(120, 10*boxOffset + box1pos[1], 61, 16))
 		self.gainAutoLabel.setObjectName("gainAutoLabel")
+		
 		self.gainBox = QtWidgets.QDoubleSpinBox(self.centralwidget)
-		self.gainBox.setGeometry(QtCore.QRect(20, 470, 81, 22))
+		self.gainBox.setGeometry(QtCore.QRect(20, 11*boxOffset + box1pos[1],*boxDimensions))
 		self.gainBox.setDecimals(1)
 		self.gainBox.setMaximum(48.0)
 		self.gainBox.setObjectName("gainBox")
+		
 		self.gainLabel = QtWidgets.QLabel(self.centralwidget)
-		self.gainLabel.setGeometry(QtCore.QRect(110, 460, 81, 31))
-		font = QtGui.QFont()
-		font.setPointSize(8)
-		self.gainLabel.setFont(font)
+		self.gainLabel.setGeometry(QtCore.QRect(110, 11*boxOffset + box1pos[1], 81, 31))
+		self.gainLabel.setFont(labelfont)
 		self.gainLabel.setObjectName("gainLabel")
+		
 		self.manualFPSBox = QtWidgets.QComboBox(self.centralwidget)
-		self.manualFPSBox.setGeometry(QtCore.QRect(20, 350, 81, 22))
+		self.manualFPSBox.setGeometry(QtCore.QRect(20, 8*boxOffset + box1pos[1],*boxDimensions))
 		self.manualFPSBox.setObjectName("manualFPSBox")
+		
 		self.manualFPSLabel = QtWidgets.QLabel(self.centralwidget)
-		self.manualFPSLabel.setGeometry(QtCore.QRect(110, 350, 71, 16))
-		font = QtGui.QFont()
-		font.setPointSize(10)
-		self.manualFPSLabel.setFont(font)
+		self.manualFPSLabel.setGeometry(QtCore.QRect(110, 8*boxOffset + box1pos[1], 71, 16))
+		self.manualFPSLabel.setFont(labelfont)
 		self.manualFPSLabel.setObjectName("manualFPSLabel")
+		
 		self.FPSBox = QtWidgets.QSpinBox(self.centralwidget)
-		self.FPSBox.setGeometry(QtCore.QRect(20, 390, 81, 22))
+		self.FPSBox.setGeometry(QtCore.QRect(20, 9*boxOffset + box1pos[1],*boxDimensions))
 		self.FPSBox.setObjectName("FPSBox")
 		self.FPSLabel = QtWidgets.QLabel(self.centralwidget)
-		self.FPSLabel.setGeometry(QtCore.QRect(110, 390, 71, 16))
-		font = QtGui.QFont()
-		font.setPointSize(10)
-		self.FPSLabel.setFont(font)
+		self.FPSLabel.setGeometry(QtCore.QRect(110, 9*boxOffset + box1pos[1], 71, 16))
+		self.FPSLabel.setFont(labelfont)
 		self.FPSLabel.setObjectName("FPSLabel")
-		self.stopButton = QtWidgets.QPushButton(self.centralwidget)
-		self.stopButton.setGeometry(QtCore.QRect(160, 520, 75, 23))
-		self.stopButton.setObjectName("stopButton")
+		
+
+		
 		self.colourBox = QtWidgets.QComboBox(self.centralwidget)
-		self.colourBox.setGeometry(QtCore.QRect(20, 310, 81, 22))
+		self.colourBox.setGeometry(QtCore.QRect(20, 7*boxOffset + box1pos[1],*boxDimensions))
 		self.colourBox.setObjectName("colourBox")
+		
 		self.colourBoxLabel = QtWidgets.QLabel(self.centralwidget)
-		self.colourBoxLabel.setGeometry(QtCore.QRect(110, 310, 91, 16))
-		font = QtGui.QFont()
-		font.setPointSize(10)
-		self.colourBoxLabel.setFont(font)
+		self.colourBoxLabel.setFont(labelfont)
 		self.colourBoxLabel.setObjectName("colourBoxLabel")
+		self.colourBoxLabel.setGeometry(QtCore.QRect(110, 7*boxOffset + box1pos[1], 91, 16))
+		
+		self.stopButton = QtWidgets.QPushButton(self.centralwidget)
+		self.stopButton.setGeometry(QtCore.QRect(170, 12*boxOffset + box1pos[1], 75, 23))
+		self.stopButton.setObjectName("stopButton")	
+		self.stopButton.setFont(font)
+		self.stopButton.adjustSize()
+
 		MainWindow.setCentralWidget(self.centralwidget)
 		MainWindow.setCentralWidget(self.centralwidget)
 		self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -339,6 +372,17 @@ class Ui_MainWindow(object):
 		self.statusbar.setObjectName("statusbar")
 		MainWindow.setStatusBar(self.statusbar)
 		
+		self.yOffsetBox.setFont(boxfont)
+		self.xOffsetBox.setFont(boxfont)
+		self.xResBox.setFont(boxfont)
+		self.yResBox.setFont(boxfont)
+		self.monitorxBox.setFont(boxfont)
+		self.monitoryBox.setFont(boxfont)
+		self.colourBox.setFont(boxfont)
+		self.manualFPSBox.setFont(boxfont)
+		self.FPSBox.setFont(boxfont)
+		self.gainAutoBox.setFont(boxfont)
+		self.gainBox.setFont(boxfont)
 		
 		self.manualFPSBox.addItem('False')
 		self.manualFPSBox.addItem('True')
@@ -377,7 +421,7 @@ class Ui_MainWindow(object):
 "Auto to \'Off\')"))
 		self.manualFPSLabel.setText(_translate("MainWindow", "Manual FPS"))
 		self.manualFPSLabel.adjustSize()
-		#self.runButton.adjustSize()
+		self.colourBoxLabel.setText(_translate("MainWindow","colour format"))
 		
 		self.FPSLabel.setText(_translate("MainWindow", "FPS"))
 		self.stopButton.setText(_translate("MainWindow", "Stop"))
@@ -397,7 +441,7 @@ class Ui_MainWindow(object):
 		gain = self.gainBox.value()
 		colourFormat = self.colourBox.currentText()
 		self.thread = Worker(width = width,height = height,ox = ox,oy = oy, monitorx = monitorx,monitory = monitory,
-		manualfps = manualfps,fps = fps,gainAuto = gainAuto,gain = gain, fmt = colourFormat)
+		manualfps = manualfps,fps = fps,gainAuto = gainAuto,gain = gain, fmt = colourFormat, screenwidth = self.screenwidth)
 		self.thread.start()
 		self.runButton.setEnabled(False)
 	def stop_worker(self):
