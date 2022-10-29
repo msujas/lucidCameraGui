@@ -208,11 +208,11 @@ class Worker(QtCore.QThread):
 class Ui_MainWindow(object):
 	def setupUi(self, MainWindow):
 		MainWindow.setObjectName("Lucid GUI")
-		MainWindow.resize(266, 597)
+		MainWindow.resize(280, 597)
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
 		self.centralwidget.setObjectName("centralwidget")
 		self.runButton = QtWidgets.QPushButton(self.centralwidget)
-		self.runButton.setGeometry(QtCore.QRect(20, 510, 111, 41))
+		self.runButton.setGeometry(QtCore.QRect(20, 510, 130, 41))
 		font = QtGui.QFont()
 		font.setPointSize(12)
 		self.runButton.setFont(font)
@@ -254,7 +254,7 @@ class Ui_MainWindow(object):
 		self.xOffsetLabel.setGeometry(QtCore.QRect(120, 110, 47, 13))
 		self.xOffsetLabel.setObjectName("xOffsetLabel")
 		self.yOffsetLabel = QtWidgets.QLabel(self.centralwidget)
-		self.yOffsetLabel.setGeometry(QtCore.QRect(120, 140, 47, 13))
+		self.yOffsetLabel.setGeometry(QtCore.QRect(120, 140, 47, 20))
 		self.yOffsetLabel.setObjectName("yOffsetLabel")
 		self.monitorxLabel = QtWidgets.QLabel(self.centralwidget)
 		self.monitorxLabel.setGeometry(QtCore.QRect(110, 200, 111, 16))
@@ -265,13 +265,13 @@ class Ui_MainWindow(object):
 		self.monitoryBox = QtWidgets.QSpinBox(self.centralwidget)
 		self.monitoryBox.setGeometry(QtCore.QRect(20, 240, 81, 22))
 		self.monitoryBox.setMinimum(100)
-		self.monitoryBox.setMaximum(1350)
+		self.monitoryBox.setMaximum(3000)
 		self.monitoryBox.setSingleStep(1)
 		self.monitoryBox.setStepType(QtWidgets.QAbstractSpinBox.DefaultStepType)
 		self.monitoryBox.setProperty("value", 1300)
 		self.monitoryBox.setObjectName("monitoryBox")
 		self.aspectInfoLabel = QtWidgets.QLabel(self.centralwidget)
-		self.aspectInfoLabel.setGeometry(QtCore.QRect(20, 260, 201, 41))
+		self.aspectInfoLabel.setGeometry(QtCore.QRect(20, 265, 201, 41))
 		font = QtGui.QFont()
 		font.setPointSize(7)
 		self.aspectInfoLabel.setFont(font)
@@ -338,7 +338,8 @@ class Ui_MainWindow(object):
 		self.statusbar = QtWidgets.QStatusBar(MainWindow)
 		self.statusbar.setObjectName("statusbar")
 		MainWindow.setStatusBar(self.statusbar)
-
+		
+		
 		self.manualFPSBox.addItem('False')
 		self.manualFPSBox.addItem('True')
 		self.FPSBox.setValue(30)
@@ -376,6 +377,8 @@ class Ui_MainWindow(object):
 "Auto to \'Off\')"))
 		self.manualFPSLabel.setText(_translate("MainWindow", "Manual FPS"))
 		self.manualFPSLabel.adjustSize()
+		#self.runButton.adjustSize()
+		
 		self.FPSLabel.setText(_translate("MainWindow", "FPS"))
 		self.stopButton.setText(_translate("MainWindow", "Stop"))
 	def start_worker(self):
