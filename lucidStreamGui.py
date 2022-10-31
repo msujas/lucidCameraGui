@@ -221,13 +221,13 @@ class Ui_MainWindow(object):
 		box1pos = [int(20*scaling), int(40*scaling)]
 		boxDimensions = [int(80*scaling),int(22*scaling)]
 		boxOffset = boxDimensions[1] + int(18*scaling)		
+		labelxpos = 20 + boxDimensions[0] + 10
 		
 		basefont = int(12*scaling)
 		
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
 		self.centralwidget.setObjectName("centralwidget")
-		self.runButton = QtWidgets.QPushButton(self.centralwidget)
-		self.runButton.setGeometry(QtCore.QRect(20, 12*boxOffset + box1pos[1], 130, 41))
+
 		
 		font = QtGui.QFont()
 		font.setPointSize(basefont)
@@ -239,9 +239,11 @@ class Ui_MainWindow(object):
 		smallLabelfont.setPointSize(basefont-5)	
 
 		
-		
+		self.runButton = QtWidgets.QPushButton(self.centralwidget)
+		self.runButton.setGeometry(QtCore.QRect(20, 12*boxOffset + box1pos[1], int(130*scaling), int(40*scaling)))		
 		self.runButton.setFont(font)
 		self.runButton.setObjectName("runButton")
+		
 		self.yOffsetBox = QtWidgets.QSpinBox(self.centralwidget)
 		self.yOffsetBox.setGeometry(QtCore.QRect(20, 3*boxOffset + box1pos[1],*boxDimensions))
 		self.yOffsetBox.setMaximum(2950)
@@ -264,12 +266,14 @@ class Ui_MainWindow(object):
 		self.xResBox.setObjectName("xResBox")
 		
 		self.xResLabel = QtWidgets.QLabel(self.centralwidget)
-		self.xResLabel.setGeometry(QtCore.QRect(120, 40, 61, 16))
+		self.xResLabel.setGeometry(QtCore.QRect(labelxpos, 40, 61, 16))
 		self.xResLabel.setObjectName("xResLabel")
+		self.xResLabel.setFont(labelfont)
 		
 		self.yResLabel = QtWidgets.QLabel(self.centralwidget)
-		self.yResLabel.setGeometry(QtCore.QRect(120, boxOffset + box1pos[1], 71, 16))
+		self.yResLabel.setGeometry(QtCore.QRect(labelxpos, boxOffset + box1pos[1], 71, 16))
 		self.yResLabel.setObjectName("yResLabel")
+		self.yResLabel.setFont(labelfont)
 		
 		self.monitorxBox = QtWidgets.QSpinBox(self.centralwidget)
 		self.monitorxBox.setGeometry(QtCore.QRect(20, 4*boxOffset + box1pos[1],*boxDimensions))
@@ -280,20 +284,26 @@ class Ui_MainWindow(object):
 		self.monitorxBox.setObjectName("monitorxBox")
 
 		self.xOffsetLabel = QtWidgets.QLabel(self.centralwidget)
-		self.xOffsetLabel.setGeometry(QtCore.QRect(120, 2*boxOffset + box1pos[1], 47, 13))
+		self.xOffsetLabel.setGeometry(QtCore.QRect(labelxpos, 2*boxOffset + box1pos[1], 47, 13))
 		self.xOffsetLabel.setObjectName("xOffsetLabel")
+		self.xOffsetLabel.setFont(labelfont)
+		
 		
 		self.yOffsetLabel = QtWidgets.QLabel(self.centralwidget)
-		self.yOffsetLabel.setGeometry(QtCore.QRect(120, 3*boxOffset + box1pos[1], 47, 20))
+		self.yOffsetLabel.setGeometry(QtCore.QRect(labelxpos, 3*boxOffset + box1pos[1], 47, 20))
 		self.yOffsetLabel.setObjectName("yOffsetLabel")
+		self.yOffsetLabel.setFont(labelfont)
+		
 		
 		self.monitorxLabel = QtWidgets.QLabel(self.centralwidget)
-		self.monitorxLabel.setGeometry(QtCore.QRect(110, 4*boxOffset + box1pos[1], 111, 16))
+		self.monitorxLabel.setGeometry(QtCore.QRect(labelxpos, 4*boxOffset + box1pos[1], 111, 16))
 		self.monitorxLabel.setObjectName("monitorxLabel")
+		self.monitorxLabel.setFont(labelfont)
 		
 		self.monitoryLabel = QtWidgets.QLabel(self.centralwidget)
-		self.monitoryLabel.setGeometry(QtCore.QRect(110, 5*boxOffset + box1pos[1], 111, 16))
+		self.monitoryLabel.setGeometry(QtCore.QRect(labelxpos, 5*boxOffset + box1pos[1], 111, 16))
 		self.monitoryLabel.setObjectName("monitoryLabel")
+		self.monitoryLabel.setFont(labelfont)
 		
 		self.monitoryBox = QtWidgets.QSpinBox(self.centralwidget)
 		self.monitoryBox.setGeometry(QtCore.QRect(20, 5*boxOffset + box1pos[1],*boxDimensions))
@@ -314,8 +324,9 @@ class Ui_MainWindow(object):
 		self.gainAutoBox.setObjectName("gainAutoBox")
 		
 		self.gainAutoLabel = QtWidgets.QLabel(self.centralwidget)
-		self.gainAutoLabel.setGeometry(QtCore.QRect(120, 10*boxOffset + box1pos[1], 61, 16))
+		self.gainAutoLabel.setGeometry(QtCore.QRect(labelxpos+10, 10*boxOffset + box1pos[1], 61, 16))
 		self.gainAutoLabel.setObjectName("gainAutoLabel")
+		self.gainAutoLabel.setFont(labelfont)
 		
 		self.gainBox = QtWidgets.QDoubleSpinBox(self.centralwidget)
 		self.gainBox.setGeometry(QtCore.QRect(20, 11*boxOffset + box1pos[1],*boxDimensions))
@@ -324,7 +335,7 @@ class Ui_MainWindow(object):
 		self.gainBox.setObjectName("gainBox")
 		
 		self.gainLabel = QtWidgets.QLabel(self.centralwidget)
-		self.gainLabel.setGeometry(QtCore.QRect(110, 11*boxOffset + box1pos[1], 81, 31))
+		self.gainLabel.setGeometry(QtCore.QRect(labelxpos, 11*boxOffset + box1pos[1], 81, 31))
 		self.gainLabel.setFont(labelfont)
 		self.gainLabel.setObjectName("gainLabel")
 		
@@ -333,7 +344,7 @@ class Ui_MainWindow(object):
 		self.manualFPSBox.setObjectName("manualFPSBox")
 		
 		self.manualFPSLabel = QtWidgets.QLabel(self.centralwidget)
-		self.manualFPSLabel.setGeometry(QtCore.QRect(110, 8*boxOffset + box1pos[1], 71, 16))
+		self.manualFPSLabel.setGeometry(QtCore.QRect(labelxpos, 8*boxOffset + box1pos[1], 71, 16))
 		self.manualFPSLabel.setFont(labelfont)
 		self.manualFPSLabel.setObjectName("manualFPSLabel")
 		
@@ -341,7 +352,7 @@ class Ui_MainWindow(object):
 		self.FPSBox.setGeometry(QtCore.QRect(20, 9*boxOffset + box1pos[1],*boxDimensions))
 		self.FPSBox.setObjectName("FPSBox")
 		self.FPSLabel = QtWidgets.QLabel(self.centralwidget)
-		self.FPSLabel.setGeometry(QtCore.QRect(110, 9*boxOffset + box1pos[1], 71, 16))
+		self.FPSLabel.setGeometry(QtCore.QRect(labelxpos, 9*boxOffset + box1pos[1], 71, 16))
 		self.FPSLabel.setFont(labelfont)
 		self.FPSLabel.setObjectName("FPSLabel")
 		
@@ -354,10 +365,11 @@ class Ui_MainWindow(object):
 		self.colourBoxLabel = QtWidgets.QLabel(self.centralwidget)
 		self.colourBoxLabel.setFont(labelfont)
 		self.colourBoxLabel.setObjectName("colourBoxLabel")
-		self.colourBoxLabel.setGeometry(QtCore.QRect(110, 7*boxOffset + box1pos[1], 91, 16))
+		self.colourBoxLabel.setGeometry(QtCore.QRect(labelxpos, 7*boxOffset + box1pos[1], 91, 16))
+		
 		
 		self.stopButton = QtWidgets.QPushButton(self.centralwidget)
-		self.stopButton.setGeometry(QtCore.QRect(170, 12*boxOffset + box1pos[1], 75, 23))
+		self.stopButton.setGeometry(QtCore.QRect(20 + int(130*scaling) + 10, 12*boxOffset + box1pos[1], 75, 23))
 		self.stopButton.setObjectName("stopButton")	
 		self.stopButton.setFont(font)
 		self.stopButton.adjustSize()
@@ -402,12 +414,15 @@ class Ui_MainWindow(object):
 		_translate = QtCore.QCoreApplication.translate
 		MainWindow.setWindowTitle(_translate("MainWindow", "Lucid GUI"))
 		self.runButton.setText(_translate("MainWindow", "Let\'s gooooo!"))
+
 		self.xResLabel.setText(_translate("MainWindow", "x-resolution"))
 		self.xResLabel.adjustSize()
 		self.yResLabel.setText(_translate("MainWindow", "y-resolution"))
 		self.yResLabel.adjustSize()
 		self.xOffsetLabel.setText(_translate("MainWindow", "x-offset"))
+		self.xOffsetLabel.adjustSize()
 		self.yOffsetLabel.setText(_translate("MainWindow", "y-offset"))
+		self.yOffsetLabel.adjustSize()
 		self.monitorxLabel.setText(_translate("MainWindow", "x image size on screen"))
 		self.monitorxLabel.adjustSize()
 		self.monitoryLabel.setText(_translate("MainWindow", "y image size on screen"))
@@ -419,11 +434,13 @@ class Ui_MainWindow(object):
 		self.gainAutoLabel.adjustSize()
 		self.gainLabel.setText(_translate("MainWindow", "Gain (set Gain\n"
 "Auto to \'Off\')"))
+		self.gainLabel.adjustSize()
 		self.manualFPSLabel.setText(_translate("MainWindow", "Manual FPS"))
 		self.manualFPSLabel.adjustSize()
 		self.colourBoxLabel.setText(_translate("MainWindow","colour format"))
-		
+		self.colourBoxLabel.adjustSize()
 		self.FPSLabel.setText(_translate("MainWindow", "FPS"))
+		self.FPSLabel.adjustSize()
 		self.stopButton.setText(_translate("MainWindow", "Stop"))
 	def start_worker(self):
 		width = self.xResBox.value()
