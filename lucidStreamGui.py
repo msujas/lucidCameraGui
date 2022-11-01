@@ -185,8 +185,13 @@ class Worker(QtCore.QThread):
 				Create a reshaped NumPy array to display using OpenCV
 				"""
 				npndarray = np.ndarray(buffer=array, dtype=np.uint8, shape=(item.height, item.width, num_channels)) # buffer_bytes_per_pixel))
-				npndarray = np.where(cross == True, crossElement, npndarray)
-	
+				#npndarray = np.where(cross == True, crossElement, npndarray)
+				npndarray[crossOffsetH + int(self.height/2-(crossThickness-1)/2+1): crossOffsetH + int(self.height/2+(crossThickness-1)/2), crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+ int(self.width/2+crosssize/2)] = crossElement #middle horizontal
+				npndarray[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),crossOffsetW+ int(self.width/2 - crossThickness/2 +1): crossOffsetW+int(self.width/2 + crossThickness/2)] = crossElement #middle vertical
+				npndarray[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+int(self.width/2-crosssize/2 + 1 + crossThickness)] = crossElement #left vertical
+				npndarray[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),crossOffsetW+ int(self.width/2+crosssize/2-crossThickness):  crossOffsetW+int(self.width/2+crosssize/2)] = crossElement #right vertical
+				npndarray[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2-crosssize/2 + crossThickness+1),crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+int(self.width/2+crosssize/2)] = crossElement #lower horizontal
+				npndarray[crossOffsetH + int(self.height/2+crosssize/2-crossThickness):  crossOffsetH + int(self.height/2+crosssize/2), crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+int(self.width/2+crosssize/2)] = crossElement #upper horizontal
 				fps = str(1/(curr_frame_time - prev_frame_time))
 				resize = cv2.resize(npndarray,(self.monitorx,self.monitory))
 
