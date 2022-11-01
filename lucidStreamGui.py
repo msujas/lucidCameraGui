@@ -113,7 +113,7 @@ class Worker(QtCore.QThread):
 		cross = np.empty(shape = (self.height,self.width,1))
 		crosssize = 200
 		crossOffsetH = 0 #offset from center
-		crossOffsetW
+		crossOffsetW = 0
 		cross[crossOffsetH + int(self.height/2)-1:              crossOffsetH + int(self.height/2)+2,              crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+ int(self.width/2+crosssize/2)] = [True]
 		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),    crossOffsetW+ int(self.width/2)-1:              crossOffsetW+int(self.width/2)+2] = [True]
 		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),    crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+int(self.width/2-crosssize/2 + 4)] = [True]
@@ -141,11 +141,14 @@ class Worker(QtCore.QThread):
 		cycletimes = np.array([])
 		textpos = (np.uint16(7*self.monitorx/1920), np.uint16(70*self.monitory/1080))
 		textsize = 3*self.monitorx/1920
-		print(f'monitorx {monitorx}, monitory {monitory}')
+		print(f'monitorx {self.monitorx}, monitory {self.monitory}')
 		windowName = 'Lucid (press stop to close)'
 		cv2.namedWindow(windowName)
-		cv2.moveWindow(windowName,self.screenwidth-monitorx,0)
-		crossElement = [255]*num_channels
+		cv2.moveWindow(windowName,self.screenwidth-self.monitorx,0)
+		if num_channels == 3:
+			crossElement = np.array([0,0,255], dtype = np.uint8)
+		elif num_channels == 1:
+			crossElement = np.array([255],dtype = np.uint8)
 		with device.start_stream():
 			"""
 			Infinitely fetch and display buffer data until esc is pressed
