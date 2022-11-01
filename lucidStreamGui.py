@@ -18,6 +18,9 @@ import cv2
 import time
 import matplotlib.pyplot as plt
 
+
+
+
 class Worker(QtCore.QThread):
 	def __init__(self,width, height, ox, oy,monitorx, monitory,manualfps,fps, gainAuto, gain, fmt, screenwidth):
 		super(Worker,self).__init__()
@@ -60,7 +63,7 @@ class Worker(QtCore.QThread):
 			return
 		nodemap = device.nodemap
 		nodes = nodemap.get_node(['Width', 'Height', 'PixelFormat','OffsetX','OffsetY', 'AcquisitionFrameRateEnable', 'AcquisitionFrameRate','GainAuto', 'Gain'])
-	
+
 		pixelFormats =	{'Mono8':1, 'Mono10':1, 'Mono10p':1, 'Mono10Packed':1, 'Mono12':1, 'Mono12p':1,
 		'Mono12Packed':1, 'Mono16':1, 'BayerRG8':2, 'BayerRG10':2, 'BayerRG10p':2, 'BayerRG10Packed':2,
 		'BayerRG12':2, 'BayerRG12p':2, 'BayerRG12Packed':2, 'BayerRG16':2, 'RGB8':3, 'BGR8':3, 'YCbCr8':3,
@@ -107,7 +110,16 @@ class Worker(QtCore.QThread):
 	
 		aspect = nodes['Width'].value/nodes['Height'].value
 
-	
+		cross = np.empty(shape = (self.height,self.width,1))
+		crosssize = 200
+		crossOffsetH = 0 #offset from center
+		crossOffsetW
+		cross[crossOffsetH + int(self.height/2)-1:              crossOffsetH + int(self.height/2)+2,              crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+ int(self.width/2+crosssize/2)] = [True]
+		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),    crossOffsetW+ int(self.width/2)-1:              crossOffsetW+int(self.width/2)+2] = [True]
+		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),    crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+int(self.width/2-crosssize/2 + 4)] = [True]
+		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),    crossOffsetW+ int(self.width/2+crosssize/2-3):  crossOffsetW+int(self.width/2+crosssize/2)] = [True]
+		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2-crosssize/2 + 4),crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+int(self.width/2+crosssize/2)] = [True]
+		cross[crossOffsetH + int(self.height/2+crosssize/2-3):  crossOffsetH + int(self.height/2+crosssize/2),    crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+int(self.width/2+crosssize/2)] = [True]
 		if self.monitorx/self.monitory < aspect:
 			print('y-size doesn\'t fit aspect ratio, resizing')
 			self.monitory = int(self.monitorx/aspect)
@@ -133,6 +145,7 @@ class Worker(QtCore.QThread):
 		windowName = 'Lucid (press stop to close)'
 		cv2.namedWindow(windowName)
 		cv2.moveWindow(windowName,self.screenwidth-monitorx,0)
+		crossElement = [255]*num_channels
 		with device.start_stream():
 			"""
 			Infinitely fetch and display buffer data until esc is pressed
@@ -168,7 +181,7 @@ class Worker(QtCore.QThread):
 				Create a reshaped NumPy array to display using OpenCV
 				"""
 				npndarray = np.ndarray(buffer=array, dtype=np.uint8, shape=(item.height, item.width, num_channels)) # buffer_bytes_per_pixel))
-	
+				npndarray = np.where(cross == [True], crossElement, npndarray)
 	
 				fps = str(1/(curr_frame_time - prev_frame_time))
 				resize = cv2.resize(npndarray,(self.monitorx,self.monitory))
