@@ -112,14 +112,15 @@ class Worker(QtCore.QThread):
 
 		cross = np.empty(shape = (self.height,self.width,1))
 		crosssize = 200
+		crossThickness = 5
 		crossOffsetH = 0 #offset from center
 		crossOffsetW = 0
-		cross[crossOffsetH + int(self.height/2)-1:              crossOffsetH + int(self.height/2)+2,              crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+ int(self.width/2+crosssize/2)] = [True]
-		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),    crossOffsetW+ int(self.width/2)-1:              crossOffsetW+int(self.width/2)+2] = [True]
-		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),    crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+int(self.width/2-crosssize/2 + 4)] = [True]
-		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),    crossOffsetW+ int(self.width/2+crosssize/2-3):  crossOffsetW+int(self.width/2+crosssize/2)] = [True]
-		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2-crosssize/2 + 4),crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+int(self.width/2+crosssize/2)] = [True]
-		cross[crossOffsetH + int(self.height/2+crosssize/2-3):  crossOffsetH + int(self.height/2+crosssize/2),    crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+int(self.width/2+crosssize/2)] = [True]
+		cross[crossOffsetH + int(self.height/2-(crossThickness-1)/2+1): crossOffsetH + int(self.height/2+(crossThickness-1)/2), crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+ int(self.width/2+crosssize/2)] = True #middle horizontal
+		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),crossOffsetW+ int(self.width/2 - crossThickness/2 +1): crossOffsetW+int(self.width/2 + crossThickness/2)] = True #middle vertical
+		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+int(self.width/2-crosssize/2 + 1 + crossThickness)] = True #left vertical
+		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2+crosssize/2),crossOffsetW+ int(self.width/2+crosssize/2-crossThickness):  crossOffsetW+int(self.width/2+crosssize/2)] = True #right vertical
+		cross[crossOffsetH + int(self.height/2-crosssize/2 + 1):crossOffsetH + int(self.height/2-crosssize/2 + crossThickness+1),crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+int(self.width/2+crosssize/2)] = True #lower horizontal
+		cross[crossOffsetH + int(self.height/2+crosssize/2-crossThickness):  crossOffsetH + int(self.height/2+crosssize/2), crossOffsetW+ int(self.width/2-crosssize/2 + 1):crossOffsetW+int(self.width/2+crosssize/2)] = True #upper horizontal
 		if self.monitorx/self.monitory < aspect:
 			print('y-size doesn\'t fit aspect ratio, resizing')
 			self.monitory = int(self.monitorx/aspect)
@@ -184,7 +185,7 @@ class Worker(QtCore.QThread):
 				Create a reshaped NumPy array to display using OpenCV
 				"""
 				npndarray = np.ndarray(buffer=array, dtype=np.uint8, shape=(item.height, item.width, num_channels)) # buffer_bytes_per_pixel))
-				npndarray = np.where(cross == [True], crossElement, npndarray)
+				npndarray = np.where(cross == True, crossElement, npndarray)
 	
 				fps = str(1/(curr_frame_time - prev_frame_time))
 				resize = cv2.resize(npndarray,(self.monitorx,self.monitory))
