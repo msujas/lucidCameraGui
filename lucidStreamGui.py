@@ -117,10 +117,9 @@ class Worker(QtCore.QThread):
 		aspect = nodes['Width'].value/nodes['Height'].value
 
 		cross = np.empty(shape = (self.height,self.width,1))
-		self.crosssize = 200
-		crossThickness = 5
-		self.crossOffsetH = 0 #offset from center
-		self.crossOffsetW = 0
+
+		crossThickness = 10
+
 		cross[self.crossOffsetH + int(self.height/2-(crossThickness-1)/2+1): self.crossOffsetH + int(self.height/2+(crossThickness-1)/2), self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+ int(self.width/2+self.crosssize/2)] = True #middle horizontal
 		cross[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2+self.crosssize/2),self.crossOffsetW+ int(self.width/2 - crossThickness/2 +1): self.crossOffsetW+int(self.width/2 + crossThickness/2)] = True #middle vertical
 		cross[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2+self.crosssize/2),self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2-self.crosssize/2 + 1 + crossThickness)] = True #left vertical
@@ -208,7 +207,7 @@ class Worker(QtCore.QThread):
 					npndarray[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2-self.crosssize/2 + crossThickness+1),
 					self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2+self.crosssize/2)] = crossElement #lower horizontal
 
-					npndarray[self.crossOffsetH + int(self.height/2+self.crosssize/2-self.crossThickness):  self.crossOffsetH + int(self.height/2+self.crosssize/2),
+					npndarray[self.crossOffsetH + int(self.height/2+self.crosssize/2-crossThickness):  self.crossOffsetH + int(self.height/2+self.crosssize/2),
 					self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2+self.crosssize/2)] = crossElement #upper horizontal
 				#fps = str(1/(curr_frame_time - prev_frame_time))
 				resize = cv2.resize(npndarray,(self.monitorx,self.monitory))
@@ -358,7 +357,7 @@ class Ui_MainWindow(object):
 		self.monitoryBox.setMaximum(3000)
 		self.monitoryBox.setSingleStep(1)
 		self.monitoryBox.setStepType(QtWidgets.QAbstractSpinBox.DefaultStepType)
-		self.monitoryBox.setProperty("value", 1300)
+		self.monitoryBox.setProperty("value", 1600)
 		self.monitoryBox.setObjectName("monitoryBox")
 		self.monitoryBox.setFont(boxfont)
 
