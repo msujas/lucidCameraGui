@@ -22,7 +22,8 @@ import matplotlib.pyplot as plt
 
 
 class Worker(QtCore.QThread):
-	def __init__(self,width, height, ox, oy,monitorx, monitory,manualfps,fps, gainAuto, gain, fmt, screenwidth, crosssize, crossOffsetH, crossOffsetW):
+	def __init__(self,width, height, ox, oy,monitorx, monitory,manualfps,fps, gainAuto, gain, fmt, screenwidth,
+	crosssize, crossOffsetH, crossOffsetW, crossCheck):
 		super(Worker,self).__init__()
 		self.width = width
 		self.height = height
@@ -39,6 +40,7 @@ class Worker(QtCore.QThread):
 		self.crosssize = crosssize
 		self.crossOffsetH = crossOffsetH
 		self.crossOffsetW = crossOffsetW
+		self.crossCheck = crossCheck
 		self.running = True
 
 	def run(self):
@@ -190,16 +192,28 @@ class Worker(QtCore.QThread):
 				"""
 				npndarray = np.ndarray(buffer=array, dtype=np.uint8, shape=(item.height, item.width, num_channels)) # buffer_bytes_per_pixel))
 				#npndarray = np.where(cross == True, crossElement, npndarray)
-				npndarray[self.crossOffsetH + int(self.height/2-(crossThickness-1)/2+1): self.crossOffsetH + int(self.height/2+(crossThickness-1)/2), self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+ int(self.width/2+self.crosssize/2)] = crossElement #middle horizontal
-				npndarray[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2+self.crosssize/2),self.crossOffsetW+ int(self.width/2 - crossThickness/2 +1): self.crossOffsetW+int(self.width/2 + crossThickness/2)] = crossElement #middle vertical
-				npndarray[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2+self.crosssize/2),self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2-self.crosssize/2 + 1 + crossThickness)] = crossElement #left vertical
-				npndarray[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2+self.crosssize/2),self.crossOffsetW+ int(self.width/2+self.crosssize/2-crossThickness):  self.crossOffsetW+int(self.width/2+cself.rosssize/2)] = crossElement #right vertical
-				npndarray[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2-self.crosssize/2 + crossThickness+1),self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2+self.crosssize/2)] = crossElement #lower horizontal
-				npndarray[self.crossOffsetH + int(self.height/2+self.crosssize/2-self.crossThickness):  self.crossOffsetH + int(self.height/2+self.crosssize/2), self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2+self.crosssize/2)] = crossElement #upper horizontal
-				fps = str(1/(curr_frame_time - prev_frame_time))
+				if self.crossCheck:
+					npndarray[self.crossOffsetH + int(self.height/2-(crossThickness-1)/2+1): self.crossOffsetH + int(self.height/2+(crossThickness-1)/2),
+					self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+ int(self.width/2+self.crosssize/2)] = crossElement #middle horizontal
+
+					npndarray[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2+self.crosssize/2),
+					self.crossOffsetW+ int(self.width/2 - crossThickness/2 +1): self.crossOffsetW+int(self.width/2 + crossThickness/2)] = crossElement #middle vertical
+
+					npndarray[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2+self.crosssize/2),
+					self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2-self.crosssize/2 + 1 + crossThickness)] = crossElement #left vertical
+
+					npndarray[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2+self.crosssize/2),
+					self.crossOffsetW+ int(self.width/2+self.crosssize/2-crossThickness):  self.crossOffsetW+int(self.width/2+cself.rosssize/2)] = crossElement #right vertical
+
+					npndarray[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2-self.crosssize/2 + crossThickness+1),
+					self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2+self.crosssize/2)] = crossElement #lower horizontal
+
+					npndarray[self.crossOffsetH + int(self.height/2+self.crosssize/2-self.crossThickness):  self.crossOffsetH + int(self.height/2+self.crosssize/2),
+					self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2+self.crosssize/2)] = crossElement #upper horizontal
+				#fps = str(1/(curr_frame_time - prev_frame_time))
 				resize = cv2.resize(npndarray,(self.monitorx,self.monitory))
 
-				cv2.putText(resize, fps,textpos, cv2.FONT_HERSHEY_SIMPLEX, textsize, (100, 255, 0), 3, cv2.LINE_AA)
+				#cv2.putText(resize, fps,textpos, cv2.FONT_HERSHEY_SIMPLEX, textsize, (100, 255, 0), 3, cv2.LINE_AA)
 
 				cv2.imshow(windowName,resize)
 
@@ -389,7 +403,7 @@ class Ui_MainWindow(object):
 		self.gainAutoBox.setFont(boxfont)
 
 		self.gainAutoLabel = QtWidgets.QLabel(self.centralwidget)
-		self.gainAutoLabel.setGeometry(QtCore.QRect(labelxpos+10, 10*boxOffset + box1pos[1], 61, 16))
+		self.gainAutoLabel.setGeometry(QtCore.QRect(int(labelxpos+10*scaling), 10*boxOffset + box1pos[1], 61, 16))
 		self.gainAutoLabel.setObjectName("gainAutoLabel")
 		self.gainAutoLabel.setFont(labelfont)
 
@@ -414,34 +428,44 @@ class Ui_MainWindow(object):
 		self.crossSizeBox.setValue(700)
 
 		self.crossSizeLabel = QtWidgets.QLabel(self.centralwidget)
-		self.crossSizeLabel.setGeometry(QtCore.QRect(labelxpos, int(11.8*boxOffset + box1pos[1]), 81, 31))
+		self.crossSizeLabel.setGeometry(QtCore.QRect(labelxpos, int(12*boxOffset + box1pos[1]), 81, 31))
 		self.crossSizeLabel.setObjectName("crossSizeLabel")
 		self.crossSizeLabel.setText('cross size')
 		self.crossSizeLabel.setFont(labelfont)
+		self.crossSizeLabel.adjustSize()
+
+		self.crossCheckBox =  QtWidgets.QCheckBox(self.centralwidget)
+		self.crossCheckBox.setGeometry(QtCore.QRect(labelxpos + int(60*scaling), 12*boxOffset + box1pos[1],int(10*scaling),int(10*scaling)))
+		self.crossCheckBox.setObjectName('crossCheckBox')
+		self.crossCheckBox.setText('display cross?')
+		self.crossCheckBox.setChecked(True)
+		self.crossCheckBox.adjustSize()
 
 		self.crossHLabel = QtWidgets.QLabel(self.centralwidget)
-		self.crossHLabel.setGeometry(QtCore.QRect(20, int(12.4*boxOffset + box1pos[1]), 81, 31))
-		self.crossHLabel.setObjectName("crossSizeLabel")
+		self.crossHLabel.setGeometry(QtCore.QRect(20, int(12.6*boxOffset + box1pos[1]), 81, 31))
+		self.crossHLabel.setObjectName("crossHLabel")
 		self.crossHLabel.setText('cross y offset')
 		self.crossHLabel.setFont(labelfont)
+		self.crossHLabel.adjustSize()
 
 		self.crossOffsetHBox =  QtWidgets.QSpinBox(self.centralwidget)
 		self.crossOffsetHBox.setGeometry(QtCore.QRect(20, 13*boxOffset + box1pos[1],*boxDimensions))
-		self.crossOffsetHBox.setObjectName("crossSizeBox")
+		self.crossOffsetHBox.setObjectName("crossOffsetHBox")
 		self.crossOffsetHBox.setFont(boxfont)
 		self.crossOffsetHBox.setMinimum(-1500)
 		self.crossOffsetHBox.setMaximum(1500)
 		self.crossOffsetHBox.setValue(0)
 
-		self.crossHLabel = QtWidgets.QLabel(self.centralwidget)
-		self.crossHLabel.setGeometry(QtCore.QRect(20 + boxDimensions[0] + 20, int(12.4*boxOffset + box1pos[1]), 81, 31))
-		self.crossHLabel.setObjectName("crossSizeLabel")
-		self.crossHLabel.setText('cross x offset')
-		self.crossHLabel.setFont(labelfont)
+		self.crossWLabel = QtWidgets.QLabel(self.centralwidget)
+		self.crossWLabel.setGeometry(QtCore.QRect(20 + boxDimensions[0] + 20, int(12.6*boxOffset + box1pos[1]), 81, 31))
+		self.crossWLabel.setObjectName("crossWLabel")
+		self.crossWLabel.setText('cross x offset')
+		self.crossWLabel.setFont(labelfont)
+		self.crossWLabel.adjustSize()
 
 		self.crossOffsetWBox =  QtWidgets.QSpinBox(self.centralwidget)
 		self.crossOffsetWBox.setGeometry(QtCore.QRect(20 + boxDimensions[0] + 20, 13*boxOffset + box1pos[1],*boxDimensions))
-		self.crossOffsetWBox.setObjectName("crossSizeBox")
+		self.crossOffsetWBox.setObjectName("crossOffsetWBox")
 		self.crossOffsetWBox.setFont(boxfont)
 		self.crossOffsetWBox.setMinimum(-1500)
 		self.crossOffsetWBox.setMaximum(1500)
@@ -530,13 +554,15 @@ class Ui_MainWindow(object):
 		gainAuto = self.gainAutoBox.currentText()
 		gain = self.gainBox.value()
 		colourFormat = self.colourBox.currentText()
-		self.crosssize = self.crossSizeBox.value()
-		self.crossOffsetH = self.crossOffsetHBox.value()
-		self.crossOffsetW = self.crossOffsetWBox.value()
-		
+
+		crosssize = self.crossSizeBox.value()
+		crossOffsetH = self.crossOffsetHBox.value()
+		crossOffsetW = self.crossOffsetWBox.value()
+		crossCheck = self.crossCheckBox.isChecked()
+
 		self.thread = Worker(width = width,height = height,ox = ox,oy = oy, monitorx = monitorx,monitory = monitory,
-		manualfps = manualfps,fps = fps,gainAuto = gainAuto,gain = gain, fmt = colourFormat, screenwidth = self.screenwidth,crosssize = self.crosssize,
-		crossOffsetH = self.crossOffsetH, crossOffsetW = self.crossOffsetW)
+		manualfps = manualfps,fps = fps,gainAuto = gainAuto,gain = gain, fmt = colourFormat, screenwidth = self.screenwidth,crosssize = crosssize,
+		crossOffsetH = crossOffsetH, crossOffsetW = crossOffsetW, crossCheck = crossCheck)
 
 		self.thread.start()
 		self.runButton.setEnabled(False)
