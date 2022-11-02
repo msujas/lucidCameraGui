@@ -77,8 +77,8 @@ def run(width = 4000, height = 3000, ox = 0, oy = 0,monitorx = 1920, monitory = 
     nodes['OffsetX'].value = ox
     nodes['OffsetY'].value = oy
     nodes['GainAuto'].value = gainAuto
-    if not gainAuto:
-        nodes['Gain'] = float(gain)
+    if gainAuto == 'Off':
+        nodes['Gain'].value = float(gain)
 
 
     nodes['PixelFormat'].value = fmt

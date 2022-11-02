@@ -105,7 +105,7 @@ class Worker(QtCore.QThread):
 		nodes['OffsetY'].value = self.oy
 		nodes['GainAuto'].value = self.gainAuto
 		if self.gainAuto == 'Off':
-			nodes['Gain'] = self.gain
+			nodes['Gain'].value = self.gain
 
 
 		nodes['PixelFormat'].value = self.fmt
