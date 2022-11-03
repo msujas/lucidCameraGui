@@ -480,6 +480,7 @@ class Ui_MainWindow(object):
 		self.stopButton.setObjectName("stopButton")
 		self.stopButton.setFont(font)
 		self.stopButton.adjustSize()
+		self.stopButton.setEnabled(False)
 
 		MainWindow.setCentralWidget(self.centralwidget)
 		MainWindow.setCentralWidget(self.centralwidget)
@@ -539,6 +540,7 @@ class Ui_MainWindow(object):
 		self.FPSLabel.adjustSize()
 		self.stopButton.setText(_translate("MainWindow", "Stop"))
 	def start_worker(self):
+		self.stopButton.setEnabled(True)
 		width = self.xResBox.value()
 		height = self.yResBox.value()
 		ox = self.xOffsetBox.value()
@@ -569,7 +571,7 @@ class Ui_MainWindow(object):
 	def stop_worker(self):
 		self.thread.stop()
 		self.runButton.setEnabled(True)
-
+		self.stopButton.setEnabled(False)
 
 if __name__ == "__main__":
 	import sys
