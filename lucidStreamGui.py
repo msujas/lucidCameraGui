@@ -323,7 +323,7 @@ class Ui_MainWindow(object):
 		self.monitorxBox = QtWidgets.QSpinBox(self.centralwidget)
 		self.monitorxBox.setGeometry(QtCore.QRect(20, 4*boxOffset + box1pos[1],*boxDimensions))
 		self.monitorxBox.setMinimum(100)
-		self.monitorxBox.setMaximum(2560)
+		self.monitorxBox.setMaximum(3840)
 		self.monitorxBox.setStepType(QtWidgets.QAbstractSpinBox.DefaultStepType)
 		self.monitorxBox.setProperty("value", 2500)
 		self.monitorxBox.setObjectName("monitorxBox")
