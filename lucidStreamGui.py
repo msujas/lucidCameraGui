@@ -5,7 +5,7 @@
 # Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
-import lucidLiveStream
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from arena_api.system import system
@@ -71,8 +71,8 @@ class Worker(QtCore.QThread):
 		nodes = nodemap.get_node(['Width', 'Height', 'PixelFormat','OffsetX','OffsetY', 'AcquisitionFrameRateEnable', 'AcquisitionFrameRate','GainAuto', 'Gain'])
 
 		pixelFormats =	{'Mono8':1, 'Mono10':1, 'Mono10p':1, 'Mono10Packed':1, 'Mono12':1, 'Mono12p':1,
-		'Mono12Packed':1, 'Mono16':1, 'BayerRG8':2, 'BayerRG10':2, 'BayerRG10p':2, 'BayerRG10Packed':2,
-		'BayerRG12':2, 'BayerRG12p':2, 'BayerRG12Packed':2, 'BayerRG16':2, 'RGB8':3, 'BGR8':3, 'YCbCr8':3,
+		'Mono12Packed':1, 'Mono16':1, 'BayerRG8':1, 'BayerRG10':1, 'BayerRG10p':1, 'BayerRG10Packed':1,
+		'BayerRG12':1, 'BayerRG12p':1, 'BayerRG12Packed':1, 'BayerRG16':1, 'RGB8':3, 'BGR8':3, 'YCbCr8':3,
 		'YCbCr8_CbYCr':3, 'YUV422_8':3, 'YUV422_8_UYVY':3, 'YCbCr411_8':3, 'YUV411_8_UYYVYY':3}
 
 
@@ -116,17 +116,10 @@ class Worker(QtCore.QThread):
 
 		aspect = nodes['Width'].value/nodes['Height'].value
 
-		cross = np.empty(shape = (self.height,self.width,1))
-
 		crossThickness = 10
 
-		cross[self.crossOffsetH + int(self.height/2-(crossThickness-1)/2+1): self.crossOffsetH + int(self.height/2+(crossThickness-1)/2), self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+ int(self.width/2+self.crosssize/2)] = True #middle horizontal
-		cross[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2+self.crosssize/2),self.crossOffsetW+ int(self.width/2 - crossThickness/2 +1): self.crossOffsetW+int(self.width/2 + crossThickness/2)] = True #middle vertical
-		cross[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2+self.crosssize/2),self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2-self.crosssize/2 + 1 + crossThickness)] = True #left vertical
-		cross[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2+self.crosssize/2),self.crossOffsetW+ int(self.width/2+self.crosssize/2-crossThickness):  self.crossOffsetW+int(self.width/2+self.crosssize/2)] = True #right vertical
-		cross[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2-self.crosssize/2 + crossThickness+1),self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2+self.crosssize/2)] = True #lower horizontal
-		cross[self.crossOffsetH + int(self.height/2+self.crosssize/2-crossThickness):  self.crossOffsetH + int(self.height/2+self.crosssize/2), self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2+self.crosssize/2)] = True #upper horizontal
-		if self.monitorx/self.monitory < aspect:
+
+		if self.monitorx/self.monitory < aspect: #adjusting the monitor x or y values based on the aspect ratio
 			print('y-size doesn\'t fit aspect ratio, resizing')
 			self.monitory = int(self.monitorx/aspect)
 		elif self.monitorx/self.monitory > aspect:
@@ -255,7 +248,7 @@ class Ui_MainWindow(object):
 		self.screen = QtWidgets.QApplication.primaryScreen().size()
 		self.screenwidth = self.screen.width()
 
-		scaling = (self.screenwidth/1920)**0.5
+		scaling = (self.screenwidth/1920)**0.5 #scaling box and font sizes for different screen resolutions
 		windowsize = [int(280*scaling),int(670*scaling)]
 		MainWindow.resize(*windowsize)
 		MainWindow.move(0,self.screen.height() - windowsize[1] - 75)
@@ -279,30 +272,7 @@ class Ui_MainWindow(object):
 		smallLabelfont = QtGui.QFont()
 		smallLabelfont.setPointSize(basefont-5)
 
-
-
-
-		self.yOffsetBox = QtWidgets.QSpinBox(self.centralwidget)
-		self.yOffsetBox.setGeometry(QtCore.QRect(20, 3*boxOffset + box1pos[1],*boxDimensions))
-		self.yOffsetBox.setMaximum(2950)
-		self.yOffsetBox.setObjectName("yOffsetBox")
-		self.yOffsetBox.setFont(boxfont)
-
-		self.xOffsetBox = QtWidgets.QSpinBox(self.centralwidget)
-		self.xOffsetBox.setGeometry(QtCore.QRect(20, 2*boxOffset + box1pos[1],*boxDimensions))
-		self.xOffsetBox.setMaximum(4046)
-		self.xOffsetBox.setObjectName("xOffsetBox")
-		self.xOffsetBox.setFont(boxfont)
-
-		self.yResBox = QtWidgets.QSpinBox(self.centralwidget)
-		self.yResBox.setGeometry(QtCore.QRect(20, boxOffset + box1pos[1],*boxDimensions))
-		self.yResBox.setMinimum(50)
-		self.yResBox.setMaximum(3000)
-		self.yResBox.setProperty("value", 3000)
-		self.yResBox.setObjectName("yResBox")
-		self.yResBox.setFont(boxfont)
-
-		self.xResBox = QtWidgets.QSpinBox(self.centralwidget)
+		self.xResBox = QtWidgets.QSpinBox(self.centralwidget) #select x resolution of camera
 		self.xResBox.setGeometry(QtCore.QRect(20, 40,*boxDimensions))
 		self.xResBox.setMinimum(50)
 		self.xResBox.setMaximum(4096)
@@ -315,12 +285,42 @@ class Ui_MainWindow(object):
 		self.xResLabel.setObjectName("xResLabel")
 		self.xResLabel.setFont(labelfont)
 
+		self.yResBox = QtWidgets.QSpinBox(self.centralwidget) #select y resolution of camera
+		self.yResBox.setGeometry(QtCore.QRect(20, boxOffset + box1pos[1],*boxDimensions))
+		self.yResBox.setMinimum(50)
+		self.yResBox.setMaximum(3000)
+		self.yResBox.setProperty("value", 3000)
+		self.yResBox.setObjectName("yResBox")
+		self.yResBox.setFont(boxfont)
+
 		self.yResLabel = QtWidgets.QLabel(self.centralwidget)
 		self.yResLabel.setGeometry(QtCore.QRect(labelxpos, boxOffset + box1pos[1], 71, 16))
 		self.yResLabel.setObjectName("yResLabel")
 		self.yResLabel.setFont(labelfont)
 
-		self.monitorxBox = QtWidgets.QSpinBox(self.centralwidget)
+		self.xOffsetBox = QtWidgets.QSpinBox(self.centralwidget) #select x pixel offset of camera (if not using max. resoution)
+		self.xOffsetBox.setGeometry(QtCore.QRect(20, 2*boxOffset + box1pos[1],*boxDimensions))
+		self.xOffsetBox.setMaximum(4046)
+		self.xOffsetBox.setObjectName("xOffsetBox")
+		self.xOffsetBox.setFont(boxfont)
+
+		self.xOffsetLabel = QtWidgets.QLabel(self.centralwidget)
+		self.xOffsetLabel.setGeometry(QtCore.QRect(labelxpos, 2*boxOffset + box1pos[1], 47, 13))
+		self.xOffsetLabel.setObjectName("xOffsetLabel")
+		self.xOffsetLabel.setFont(labelfont)
+
+		self.yOffsetBox = QtWidgets.QSpinBox(self.centralwidget) #select y pixel offset of camera
+		self.yOffsetBox.setGeometry(QtCore.QRect(20, 3*boxOffset + box1pos[1],*boxDimensions))
+		self.yOffsetBox.setMaximum(2950)
+		self.yOffsetBox.setObjectName("yOffsetBox")
+		self.yOffsetBox.setFont(boxfont)
+
+		self.yOffsetLabel = QtWidgets.QLabel(self.centralwidget)
+		self.yOffsetLabel.setGeometry(QtCore.QRect(labelxpos, 3*boxOffset + box1pos[1], 47, 20))
+		self.yOffsetLabel.setObjectName("yOffsetLabel")
+		self.yOffsetLabel.setFont(labelfont)
+
+		self.monitorxBox = QtWidgets.QSpinBox(self.centralwidget) #select x size of image on screen (in pixels)
 		self.monitorxBox.setGeometry(QtCore.QRect(20, 4*boxOffset + box1pos[1],*boxDimensions))
 		self.monitorxBox.setMinimum(100)
 		self.monitorxBox.setMaximum(3840)
@@ -329,29 +329,12 @@ class Ui_MainWindow(object):
 		self.monitorxBox.setObjectName("monitorxBox")
 		self.monitorxBox.setFont(boxfont)
 
-		self.xOffsetLabel = QtWidgets.QLabel(self.centralwidget)
-		self.xOffsetLabel.setGeometry(QtCore.QRect(labelxpos, 2*boxOffset + box1pos[1], 47, 13))
-		self.xOffsetLabel.setObjectName("xOffsetLabel")
-		self.xOffsetLabel.setFont(labelfont)
-
-
-		self.yOffsetLabel = QtWidgets.QLabel(self.centralwidget)
-		self.yOffsetLabel.setGeometry(QtCore.QRect(labelxpos, 3*boxOffset + box1pos[1], 47, 20))
-		self.yOffsetLabel.setObjectName("yOffsetLabel")
-		self.yOffsetLabel.setFont(labelfont)
-
-
 		self.monitorxLabel = QtWidgets.QLabel(self.centralwidget)
 		self.monitorxLabel.setGeometry(QtCore.QRect(labelxpos, 4*boxOffset + box1pos[1], 111, 16))
 		self.monitorxLabel.setObjectName("monitorxLabel")
 		self.monitorxLabel.setFont(labelfont)
 
-		self.monitoryLabel = QtWidgets.QLabel(self.centralwidget)
-		self.monitoryLabel.setGeometry(QtCore.QRect(labelxpos, 5*boxOffset + box1pos[1], 111, 16))
-		self.monitoryLabel.setObjectName("monitoryLabel")
-		self.monitoryLabel.setFont(labelfont)
-
-		self.monitoryBox = QtWidgets.QSpinBox(self.centralwidget)
+		self.monitoryBox = QtWidgets.QSpinBox(self.centralwidget) #select y size of image on screen (in pixels)
 		self.monitoryBox.setGeometry(QtCore.QRect(20, 5*boxOffset + box1pos[1],*boxDimensions))
 		self.monitoryBox.setMinimum(100)
 		self.monitoryBox.setMaximum(3000)
@@ -361,12 +344,17 @@ class Ui_MainWindow(object):
 		self.monitoryBox.setObjectName("monitoryBox")
 		self.monitoryBox.setFont(boxfont)
 
+		self.monitoryLabel = QtWidgets.QLabel(self.centralwidget)
+		self.monitoryLabel.setGeometry(QtCore.QRect(labelxpos, 5*boxOffset + box1pos[1], 111, 16))
+		self.monitoryLabel.setObjectName("monitoryLabel")
+		self.monitoryLabel.setFont(labelfont)
+
 		self.aspectInfoLabel = QtWidgets.QLabel(self.centralwidget)
 		self.aspectInfoLabel.setGeometry(QtCore.QRect(20, int(5.7*boxOffset + box1pos[1]), 201, 41))
 		self.aspectInfoLabel.setFont(smallLabelfont)
 		self.aspectInfoLabel.setObjectName("aspectInfoLabel")
 
-		self.colourBox = QtWidgets.QComboBox(self.centralwidget)
+		self.colourBox = QtWidgets.QComboBox(self.centralwidget) #select colour format
 		self.colourBox.setGeometry(QtCore.QRect(20, 7*boxOffset + box1pos[1],*boxDimensions))
 		self.colourBox.setObjectName("colourBox")
 		self.colourBox.setFont(boxfont)
@@ -376,7 +364,7 @@ class Ui_MainWindow(object):
 		self.colourBoxLabel.setObjectName("colourBoxLabel")
 		self.colourBoxLabel.setGeometry(QtCore.QRect(labelxpos, 7*boxOffset + box1pos[1], 91, 16))
 
-		self.manualFPSBox = QtWidgets.QComboBox(self.centralwidget)
+		self.manualFPSBox = QtWidgets.QComboBox(self.centralwidget) #whether to set FPS manually or automatically
 		self.manualFPSBox.setGeometry(QtCore.QRect(20, 8*boxOffset + box1pos[1],*boxDimensions))
 		self.manualFPSBox.setObjectName("manualFPSBox")
 		self.manualFPSBox.setFont(boxfont)
@@ -386,7 +374,7 @@ class Ui_MainWindow(object):
 		self.manualFPSLabel.setFont(labelfont)
 		self.manualFPSLabel.setObjectName("manualFPSLabel")
 
-		self.FPSBox = QtWidgets.QSpinBox(self.centralwidget)
+		self.FPSBox = QtWidgets.QSpinBox(self.centralwidget) #select FPS (if manual selected)
 		self.FPSBox.setGeometry(QtCore.QRect(20, 9*boxOffset + box1pos[1],*boxDimensions))
 		self.FPSBox.setObjectName("FPSBox")
 		self.FPSBox.setFont(boxfont)
@@ -396,7 +384,7 @@ class Ui_MainWindow(object):
 		self.FPSLabel.setFont(labelfont)
 		self.FPSLabel.setObjectName("FPSLabel")
 
-		self.gainAutoBox = QtWidgets.QComboBox(self.centralwidget)
+		self.gainAutoBox = QtWidgets.QComboBox(self.centralwidget) #choose whether to have gain chosen automatically or manually
 		self.gainAutoBox.setGeometry(QtCore.QRect(20, 10*boxOffset + box1pos[1], boxDimensions[0] + int(10*scaling), boxDimensions[1]))
 		self.gainAutoBox.setObjectName("gainAutoBox")
 		self.gainAutoBox.setFont(boxfont)
@@ -406,7 +394,7 @@ class Ui_MainWindow(object):
 		self.gainAutoLabel.setObjectName("gainAutoLabel")
 		self.gainAutoLabel.setFont(labelfont)
 
-		self.gainBox = QtWidgets.QDoubleSpinBox(self.centralwidget)
+		self.gainBox = QtWidgets.QDoubleSpinBox(self.centralwidget) #select gain (if gainAuto is off)
 		self.gainBox.setGeometry(QtCore.QRect(20, 11*boxOffset + box1pos[1],*boxDimensions))
 		self.gainBox.setDecimals(1)
 		self.gainBox.setMaximum(48.0)
@@ -418,7 +406,7 @@ class Ui_MainWindow(object):
 		self.gainLabel.setObjectName("gainLabel")
 		self.gainLabel.setFont(labelfont)
 
-		self.crossSizeBox =  QtWidgets.QSpinBox(self.centralwidget)
+		self.crossSizeBox =  QtWidgets.QSpinBox(self.centralwidget) #select the size of the cross that is overlayed on the image
 		self.crossSizeBox.setGeometry(QtCore.QRect(20, 12*boxOffset + box1pos[1],*boxDimensions))
 		self.crossSizeBox.setObjectName("crossSizeBox")
 		self.crossSizeBox.setFont(boxfont)
@@ -433,12 +421,20 @@ class Ui_MainWindow(object):
 		self.crossSizeLabel.setFont(labelfont)
 		self.crossSizeLabel.adjustSize()
 
-		self.crossCheckBox =  QtWidgets.QCheckBox(self.centralwidget)
+		self.crossCheckBox =  QtWidgets.QCheckBox(self.centralwidget) #select whether or not to display the cross
 		self.crossCheckBox.setGeometry(QtCore.QRect(labelxpos + int(60*scaling), 12*boxOffset + box1pos[1],int(10*scaling),int(10*scaling)))
 		self.crossCheckBox.setObjectName('crossCheckBox')
 		self.crossCheckBox.setText('display cross?')
 		self.crossCheckBox.setChecked(True)
 		self.crossCheckBox.adjustSize()
+
+		self.crossOffsetHBox =  QtWidgets.QSpinBox(self.centralwidget) #choose center position of cross in y
+		self.crossOffsetHBox.setGeometry(QtCore.QRect(20, 13*boxOffset + box1pos[1],*boxDimensions))
+		self.crossOffsetHBox.setObjectName("crossOffsetHBox")
+		self.crossOffsetHBox.setFont(boxfont)
+		self.crossOffsetHBox.setMinimum(-1500)
+		self.crossOffsetHBox.setMaximum(1500)
+		self.crossOffsetHBox.setValue(0)
 
 		self.crossHLabel = QtWidgets.QLabel(self.centralwidget)
 		self.crossHLabel.setGeometry(QtCore.QRect(20, int(12.6*boxOffset + box1pos[1]), 81, 31))
@@ -447,13 +443,13 @@ class Ui_MainWindow(object):
 		self.crossHLabel.setFont(labelfont)
 		self.crossHLabel.adjustSize()
 
-		self.crossOffsetHBox =  QtWidgets.QSpinBox(self.centralwidget)
-		self.crossOffsetHBox.setGeometry(QtCore.QRect(20, 13*boxOffset + box1pos[1],*boxDimensions))
-		self.crossOffsetHBox.setObjectName("crossOffsetHBox")
-		self.crossOffsetHBox.setFont(boxfont)
-		self.crossOffsetHBox.setMinimum(-1500)
-		self.crossOffsetHBox.setMaximum(1500)
-		self.crossOffsetHBox.setValue(0)
+		self.crossOffsetWBox =  QtWidgets.QSpinBox(self.centralwidget) #choose center position of cross in x
+		self.crossOffsetWBox.setGeometry(QtCore.QRect(20 + boxDimensions[0] + 20, 13*boxOffset + box1pos[1],*boxDimensions))
+		self.crossOffsetWBox.setObjectName("crossOffsetWBox")
+		self.crossOffsetWBox.setFont(boxfont)
+		self.crossOffsetWBox.setMinimum(-1500)
+		self.crossOffsetWBox.setMaximum(1500)
+		self.crossOffsetWBox.setValue(0)
 
 		self.crossWLabel = QtWidgets.QLabel(self.centralwidget)
 		self.crossWLabel.setGeometry(QtCore.QRect(20 + boxDimensions[0] + 20, int(12.6*boxOffset + box1pos[1]), 81, 31))
@@ -461,14 +457,6 @@ class Ui_MainWindow(object):
 		self.crossWLabel.setText('cross x offset')
 		self.crossWLabel.setFont(labelfont)
 		self.crossWLabel.adjustSize()
-
-		self.crossOffsetWBox =  QtWidgets.QSpinBox(self.centralwidget)
-		self.crossOffsetWBox.setGeometry(QtCore.QRect(20 + boxDimensions[0] + 20, 13*boxOffset + box1pos[1],*boxDimensions))
-		self.crossOffsetWBox.setObjectName("crossOffsetWBox")
-		self.crossOffsetWBox.setFont(boxfont)
-		self.crossOffsetWBox.setMinimum(-1500)
-		self.crossOffsetWBox.setMaximum(1500)
-		self.crossOffsetWBox.setValue(0)
 
 		self.runButton = QtWidgets.QPushButton(self.centralwidget)
 		self.runButton.setGeometry(QtCore.QRect(20, 14*boxOffset + box1pos[1], int(130*scaling), int(40*scaling)))
