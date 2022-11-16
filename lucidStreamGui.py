@@ -17,9 +17,14 @@ import numpy as np
 import cv2
 import time
 import matplotlib.pyplot as plt
+from datetime import datetime
+from pathlib import Path
+import os
 
-
-
+homepath = str(Path.home())
+snapshotDir = f'{homepath}/Documents/lucidSnapShots/'
+if not os.path.exists(snapshotDir):
+	os.makedirs(snapshotDir)
 
 class Worker(QtCore.QThread):
 	def __init__(self,width, height, ox, oy,monitorx, monitory,manualfps,fps, gainAuto, gain, fmt, screenwidth,
@@ -42,6 +47,7 @@ class Worker(QtCore.QThread):
 		self.crossOffsetW = crossOffsetW
 		self.crossCheck = crossCheck
 		self.running = True
+		self.snapshot = False
 
 	def run(self):
 		tries = 0
@@ -104,7 +110,7 @@ class Worker(QtCore.QThread):
 		nodes['OffsetX'].value = self.ox
 		nodes['OffsetY'].value = self.oy
 		nodes['GainAuto'].value = self.gainAuto
-		if self.gainAuto == 'Off':
+		if nodes['GainAuto'].value == 'Off':
 			nodes['Gain'].value = self.gain
 
 
@@ -156,7 +162,7 @@ class Worker(QtCore.QThread):
 			while self.running:
 				# Used to display FPS on stream
 				curr_frame_time = time.time()
-
+				nodes['Gain'].value = self.gain
 				buffer = device.get_buffer()
 
 
@@ -195,7 +201,7 @@ class Worker(QtCore.QThread):
 					self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2-self.crosssize/2 + 1 + crossThickness)] = crossElement #left vertical
 
 					npndarray[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2+self.crosssize/2),
-					self.crossOffsetW+ int(self.width/2+self.crosssize/2-crossThickness):  self.crossOffsetW+int(self.width/2+cself.rosssize/2)] = crossElement #right vertical
+					self.crossOffsetW+ int(self.width/2+self.crosssize/2-crossThickness):  self.crossOffsetW+int(self.width/2+self.crosssize/2)] = crossElement #right vertical
 
 					npndarray[self.crossOffsetH + int(self.height/2-self.crosssize/2 + 1):self.crossOffsetH + int(self.height/2-self.crosssize/2 + crossThickness+1),
 					self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2+self.crosssize/2)] = crossElement #lower horizontal
@@ -206,7 +212,11 @@ class Worker(QtCore.QThread):
 				resize = cv2.resize(npndarray,(self.monitorx,self.monitory))
 
 				#cv2.putText(resize, fps,textpos, cv2.FONT_HERSHEY_SIMPLEX, textsize, (100, 255, 0), 3, cv2.LINE_AA)
-
+				if self.snapshot:
+					dt = datetime.fromtimestamp(time.time())
+					filename = f'{snapshotDir}/{dt.day}_{dt.month}_{dt.year}_{dt.hour}{dt.minute}{dt.second}.png'
+					cv2.imwrite(filename, resize)
+					self.snapshot = False
 				cv2.imshow(windowName,resize)
 
 				"""
@@ -249,7 +259,7 @@ class Ui_MainWindow(object):
 		self.screenwidth = self.screen.width()
 
 		scaling = (self.screenwidth/1920)**0.5 #scaling box and font sizes for different screen resolutions
-		windowsize = [int(280*scaling),int(670*scaling)]
+		windowsize = [int(280*scaling),int(700*scaling)]
 		MainWindow.resize(*windowsize)
 		MainWindow.move(0,self.screen.height() - windowsize[1] - 75)
 		box1pos = [int(20*scaling), int(40*scaling)]
@@ -325,7 +335,7 @@ class Ui_MainWindow(object):
 		self.monitorxBox.setMinimum(100)
 		self.monitorxBox.setMaximum(3840)
 		self.monitorxBox.setStepType(QtWidgets.QAbstractSpinBox.DefaultStepType)
-		self.monitorxBox.setProperty("value", 2500)
+		self.monitorxBox.setProperty("value", 3000)
 		self.monitorxBox.setObjectName("monitorxBox")
 		self.monitorxBox.setFont(boxfont)
 
@@ -340,7 +350,7 @@ class Ui_MainWindow(object):
 		self.monitoryBox.setMaximum(3000)
 		self.monitoryBox.setSingleStep(1)
 		self.monitoryBox.setStepType(QtWidgets.QAbstractSpinBox.DefaultStepType)
-		self.monitoryBox.setProperty("value", 1600)
+		self.monitoryBox.setProperty("value", 2000)
 		self.monitoryBox.setObjectName("monitoryBox")
 		self.monitoryBox.setFont(boxfont)
 
@@ -406,13 +416,14 @@ class Ui_MainWindow(object):
 		self.gainLabel.setObjectName("gainLabel")
 		self.gainLabel.setFont(labelfont)
 
-		self.crossSizeBox =  QtWidgets.QSpinBox(self.centralwidget) #select the size of the cross that is overlayed on the image
+		self.crossSizeBox =	 QtWidgets.QSpinBox(self.centralwidget) #select the size of the cross that is overlayed on the image
 		self.crossSizeBox.setGeometry(QtCore.QRect(20, 12*boxOffset + box1pos[1],*boxDimensions))
 		self.crossSizeBox.setObjectName("crossSizeBox")
 		self.crossSizeBox.setFont(boxfont)
 		self.crossSizeBox.setMinimum(100)
-		self.crossSizeBox.setMaximum(2000)
+		self.crossSizeBox.setMaximum(2500)
 		self.crossSizeBox.setValue(700)
+		self.crossSizeBox.setSingleStep(10)
 
 		self.crossSizeLabel = QtWidgets.QLabel(self.centralwidget)
 		self.crossSizeLabel.setGeometry(QtCore.QRect(labelxpos, int(12*boxOffset + box1pos[1]), 81, 31))
@@ -428,13 +439,13 @@ class Ui_MainWindow(object):
 		self.crossCheckBox.setChecked(True)
 		self.crossCheckBox.adjustSize()
 
-		self.crossOffsetHBox =  QtWidgets.QSpinBox(self.centralwidget) #choose center position of cross in y
+		self.crossOffsetHBox =	QtWidgets.QSpinBox(self.centralwidget) #choose center position of cross in y
 		self.crossOffsetHBox.setGeometry(QtCore.QRect(20, 13*boxOffset + box1pos[1],*boxDimensions))
 		self.crossOffsetHBox.setObjectName("crossOffsetHBox")
 		self.crossOffsetHBox.setFont(boxfont)
 		self.crossOffsetHBox.setMinimum(-1500)
 		self.crossOffsetHBox.setMaximum(1500)
-		self.crossOffsetHBox.setValue(0)
+		self.crossOffsetHBox.setValue(-50)
 
 		self.crossHLabel = QtWidgets.QLabel(self.centralwidget)
 		self.crossHLabel.setGeometry(QtCore.QRect(20, int(12.6*boxOffset + box1pos[1]), 81, 31))
@@ -443,13 +454,13 @@ class Ui_MainWindow(object):
 		self.crossHLabel.setFont(labelfont)
 		self.crossHLabel.adjustSize()
 
-		self.crossOffsetWBox =  QtWidgets.QSpinBox(self.centralwidget) #choose center position of cross in x
+		self.crossOffsetWBox =	QtWidgets.QSpinBox(self.centralwidget) #choose center position of cross in x
 		self.crossOffsetWBox.setGeometry(QtCore.QRect(20 + boxDimensions[0] + 20, 13*boxOffset + box1pos[1],*boxDimensions))
 		self.crossOffsetWBox.setObjectName("crossOffsetWBox")
 		self.crossOffsetWBox.setFont(boxfont)
 		self.crossOffsetWBox.setMinimum(-1500)
 		self.crossOffsetWBox.setMaximum(1500)
-		self.crossOffsetWBox.setValue(0)
+		self.crossOffsetWBox.setValue(-100)
 
 		self.crossWLabel = QtWidgets.QLabel(self.centralwidget)
 		self.crossWLabel.setGeometry(QtCore.QRect(20 + boxDimensions[0] + 20, int(12.6*boxOffset + box1pos[1]), 81, 31))
@@ -469,6 +480,14 @@ class Ui_MainWindow(object):
 		self.stopButton.setFont(font)
 		self.stopButton.adjustSize()
 		self.stopButton.setEnabled(False)
+
+		self.snapShotButton = QtWidgets.QPushButton(self.centralwidget)
+		self.snapShotButton.setGeometry(QtCore.QRect(20, int(15.2*boxOffset + box1pos[1]), int(130*scaling), int(40*scaling)))
+		self.snapShotButton.setFont(labelfont)
+		self.snapShotButton.setObjectName("runButton")
+		self.snapShotButton.setText('take single image')
+		self.snapShotButton.adjustSize()
+		self.snapShotButton.setEnabled(False)
 
 		MainWindow.setCentralWidget(self.centralwidget)
 		MainWindow.setCentralWidget(self.centralwidget)
@@ -493,8 +512,14 @@ class Ui_MainWindow(object):
 		self.retranslateUi(MainWindow)
 		QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+		self.running = False
 		self.runButton.clicked.connect(self.start_worker)
 		self.stopButton.clicked.connect(self.stop_worker)
+		self.snapShotButton.clicked.connect(self.takeSingleImage)
+		self.gainBox.valueChanged.connect(self.changeGain)
+		self.crossSizeBox.valueChanged.connect(self.crossSizeChange)
+		self.crossOffsetHBox.valueChanged.connect(self.crossHChange)
+		self.crossOffsetWBox.valueChanged.connect(self.crossWChange)
 	def retranslateUi(self, MainWindow):
 		_translate = QtCore.QCoreApplication.translate
 		MainWindow.setWindowTitle(_translate("MainWindow", "Lucid GUI"))
@@ -527,8 +552,11 @@ class Ui_MainWindow(object):
 		self.FPSLabel.setText(_translate("MainWindow", "FPS"))
 		self.FPSLabel.adjustSize()
 		self.stopButton.setText(_translate("MainWindow", "Stop"))
+
 	def start_worker(self):
+		self.running = True
 		self.stopButton.setEnabled(True)
+		self.snapShotButton.setEnabled(True)
 		width = self.xResBox.value()
 		height = self.yResBox.value()
 		ox = self.xOffsetBox.value()
@@ -560,6 +588,24 @@ class Ui_MainWindow(object):
 		self.thread.stop()
 		self.runButton.setEnabled(True)
 		self.stopButton.setEnabled(False)
+		self.snapShotButton.setEnabled(False)
+		self.running = False
+	def changeGain(self):
+		if self.running:
+			self.thread.gain = self.gainBox.value()
+	def crossSizeChange(self):
+		if self.running:
+			self.thread.crosssize = self.crossSizeBox.value()
+	def crossHChange(self):
+		if self.running:
+			self.thread.crossOffsetH = self.crossOffsetHBox.value()
+	def crossWChange(self):
+		if self.running:
+			self.thread.crossOffsetW = self.crossOffsetWBox.value()
+	def takeSingleImage(self):
+		if self.running:
+			self.thread.snapshot = True
+
 
 if __name__ == "__main__":
 	import sys
