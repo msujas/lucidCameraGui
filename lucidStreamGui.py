@@ -257,11 +257,17 @@ class Ui_MainWindow(object):
 
 		self.screen = QtWidgets.QApplication.primaryScreen().size()
 		self.screenwidth = self.screen.width()
-
+		self.screenheight = self.screen.height()
+		if self.screenheight > 2000:
+			monydefault = 2000
+		elif self.screenheight > 1400:
+			monydefault = 1300
+		else:
+			monydefault = 900
 		scaling = (self.screenwidth/1920)**0.5 #scaling box and font sizes for different screen resolutions
 		windowsize = [int(280*scaling),int(700*scaling)]
 		MainWindow.resize(*windowsize)
-		MainWindow.move(0,self.screen.height() - windowsize[1] - 75)
+		MainWindow.move(0,self.screenheight - windowsize[1] - 75)
 		box1pos = [int(20*scaling), int(40*scaling)]
 		boxDimensions = [int(80*scaling),int(22*scaling)]
 		boxOffset = boxDimensions[1] + int(18*scaling)
@@ -350,7 +356,7 @@ class Ui_MainWindow(object):
 		self.monitoryBox.setMaximum(3000)
 		self.monitoryBox.setSingleStep(1)
 		self.monitoryBox.setStepType(QtWidgets.QAbstractSpinBox.DefaultStepType)
-		self.monitoryBox.setProperty("value", 2000)
+		self.monitoryBox.setProperty("value", monydefault)
 		self.monitoryBox.setObjectName("monitoryBox")
 		self.monitoryBox.setFont(boxfont)
 
