@@ -22,7 +22,8 @@ from pathlib import Path
 import os
 
 homepath = str(Path.home())
-snapshotDir = f'{homepath}/Documents/lucidSnapShots/'
+endpath = 'Documents/lucidSnapShots'
+snapshotDir = f'{homepath}/{endpath}/'
 if not os.path.exists(snapshotDir):
 	os.makedirs(snapshotDir)
 
@@ -461,7 +462,7 @@ class Ui_MainWindow(object):
 		self.crossHLabel.adjustSize()
 
 		self.crossOffsetWBox =	QtWidgets.QSpinBox(self.centralwidget) #choose center position of cross in x
-		self.crossOffsetWBox.setGeometry(QtCore.QRect(20 + boxDimensions[0] + 20, 13*boxOffset + box1pos[1],*boxDimensions))
+		self.crossOffsetWBox.setGeometry(QtCore.QRect(30 + boxDimensions[0], 13*boxOffset + box1pos[1],*boxDimensions))
 		self.crossOffsetWBox.setObjectName("crossOffsetWBox")
 		self.crossOffsetWBox.setFont(boxfont)
 		self.crossOffsetWBox.setMinimum(-1500)
@@ -469,11 +470,22 @@ class Ui_MainWindow(object):
 		self.crossOffsetWBox.setValue(-100)
 
 		self.crossWLabel = QtWidgets.QLabel(self.centralwidget)
-		self.crossWLabel.setGeometry(QtCore.QRect(20 + boxDimensions[0] + 20, int(12.6*boxOffset + box1pos[1]), 81, 31))
+		self.crossWLabel.setGeometry(QtCore.QRect(30 + boxDimensions[0], int(12.6*boxOffset + box1pos[1]), 81, 31))
 		self.crossWLabel.setObjectName("crossWLabel")
 		self.crossWLabel.setText('cross x offset')
 		self.crossWLabel.setFont(labelfont)
 		self.crossWLabel.adjustSize()
+
+		self.lockCrossPositionBox =  QtWidgets.QCheckBox(self.centralwidget) #select whether or not to display the cross
+		self.lockCrossPositionBox.setGeometry(QtCore.QRect(2*boxDimensions[0] + 40, int(12.9*boxOffset + box1pos[1]),int(10*scaling),int(10*scaling)))
+		self.lockCrossPositionBox.setObjectName('lockCrossPositionBox')
+		self.lockCrossPositionBox.setText('lock cross\nposition')
+		self.lockCrossPositionBox.setChecked(True)
+		self.lockCrossPositionBox.adjustSize()
+
+		if self.lockCrossPositionBox.isChecked():
+			self.crossOffsetWBox.setEnabled(False)
+			self.crossOffsetHBox.setEnabled(False)
 
 		self.runButton = QtWidgets.QPushButton(self.centralwidget)
 		self.runButton.setGeometry(QtCore.QRect(20, 14*boxOffset + box1pos[1], int(130*scaling), int(40*scaling)))
@@ -499,9 +511,8 @@ class Ui_MainWindow(object):
 		self.snapShotLabel.setGeometry(QtCore.QRect(40 + self.snapShotButton.width(), int(15.2*boxOffset + box1pos[1]), int(130*scaling), int(40*scaling)))
 		self.snapShotLabel.setFont(labelfont)
 		self.snapShotLabel.setObjectName("snapShotLabel")
-		self.snapShotLabel.setText(f'files saved in\nDocuments/lucidSnapShots/')
+		self.snapShotLabel.setText(f'files saved in\n{endpath}/')
 		self.snapShotLabel.adjustSize()
-		self.snapShotLabel.setEnabled(False)
 
 		MainWindow.setCentralWidget(self.centralwidget)
 		MainWindow.setCentralWidget(self.centralwidget)
@@ -534,6 +545,7 @@ class Ui_MainWindow(object):
 		self.crossSizeBox.valueChanged.connect(self.crossSizeChange)
 		self.crossOffsetHBox.valueChanged.connect(self.crossHChange)
 		self.crossOffsetWBox.valueChanged.connect(self.crossWChange)
+		self.lockCrossPositionBox.stateChanged.connect(self.crossDisplayCheck)
 	def retranslateUi(self, MainWindow):
 		_translate = QtCore.QCoreApplication.translate
 		MainWindow.setWindowTitle(_translate("MainWindow", "Lucid GUI"))
@@ -619,8 +631,13 @@ class Ui_MainWindow(object):
 	def takeSingleImage(self):
 		if self.running:
 			self.thread.snapshot = True
-
-
+	def crossDisplayCheck(self):
+		if self.lockCrossPositionBox.isChecked():
+			self.crossOffsetHBox.setEnabled(False)
+			self.crossOffsetWBox.setEnabled(False)
+		else:
+			self.crossOffsetHBox.setEnabled(True)
+			self.crossOffsetWBox.setEnabled(True)
 if __name__ == "__main__":
 	import sys
 	app = QtWidgets.QApplication(sys.argv)
