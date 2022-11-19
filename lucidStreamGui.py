@@ -27,6 +27,11 @@ snapshotDir = f'{homepath}/{endpath}/'
 if not os.path.exists(snapshotDir):
 	os.makedirs(snapshotDir)
 
+if os.path.exists('lastDirectory.txt'):
+	f = open('lastDirectory.txt','r')
+	snapshotDir = f.read()
+	f.close()
+
 class Worker(QtCore.QThread):
 	def __init__(self,width, height, ox, oy,monitorx, monitory,manualfps,fps, gainAuto, gain, fmt, screenwidth,
 	crosssize, crossOffsetH, crossOffsetW, crossCheck):
@@ -288,9 +293,22 @@ class Ui_MainWindow(object):
 		labelfont.setPointSize(basefont-4)
 		smallLabelfont = QtGui.QFont()
 		smallLabelfont.setPointSize(basefont-5)
-
+		
+		self.directoryBox = QtWidgets.QLineEdit(self.centralwidget)
+		self.directoryBox.setGeometry(QtCore.QRect(20, int(box1pos[1]-0.8*boxOffset),int(boxDimensions[0]*2),boxDimensions[1]))
+		self.directoryBox.setObjectName("directoryBox")
+		self.directoryBox.setFont(boxfont)
+		self.directoryBox.setText(snapshotDir)
+		
+		self.openDirectoryButton = QtWidgets.QPushButton(self.centralwidget)
+		self.openDirectoryButton.setGeometry(QtCore.QRect(int(20 + 10*scaling + boxDimensions[0]*2), int(box1pos[1]-0.8*boxOffset),boxDimensions[1],boxDimensions[1]))
+		self.openDirectoryButton.setObjectName("openDirectoryButton")
+		self.openDirectoryButton.setFont(boxfont)
+		self.openDirectoryButton.setText('...')
+		
+		
 		self.xResBox = QtWidgets.QSpinBox(self.centralwidget) #select x resolution of camera
-		self.xResBox.setGeometry(QtCore.QRect(20, 40,*boxDimensions))
+		self.xResBox.setGeometry(QtCore.QRect(20, box1pos[1],*boxDimensions))
 		self.xResBox.setMinimum(50)
 		self.xResBox.setMaximum(4096)
 		self.xResBox.setProperty("value", 4000)
@@ -507,12 +525,12 @@ class Ui_MainWindow(object):
 		self.snapShotButton.adjustSize()
 		self.snapShotButton.setEnabled(False)
 
-		self.snapShotLabel = QtWidgets.QLabel(self.centralwidget)
-		self.snapShotLabel.setGeometry(QtCore.QRect(40 + self.snapShotButton.width(), int(15.2*boxOffset + box1pos[1]), int(130*scaling), int(40*scaling)))
-		self.snapShotLabel.setFont(labelfont)
-		self.snapShotLabel.setObjectName("snapShotLabel")
-		self.snapShotLabel.setText(f'files saved in\n{endpath}/')
-		self.snapShotLabel.adjustSize()
+		#self.snapShotLabel = QtWidgets.QLabel(self.centralwidget)
+		#self.snapShotLabel.setGeometry(QtCore.QRect(40 + self.snapShotButton.width(), int(15.2*boxOffset + box1pos[1]), int(130*scaling), int(40*scaling)))
+		#self.snapShotLabel.setFont(labelfont)
+		#self.snapShotLabel.setObjectName("snapShotLabel")
+		#self.snapShotLabel.setText(f'files saved in\n{endpath}/')
+		#self.snapShotLabel.adjustSize()
 
 		MainWindow.setCentralWidget(self.centralwidget)
 		MainWindow.setCentralWidget(self.centralwidget)
@@ -546,6 +564,8 @@ class Ui_MainWindow(object):
 		self.crossOffsetHBox.valueChanged.connect(self.crossHChange)
 		self.crossOffsetWBox.valueChanged.connect(self.crossWChange)
 		self.lockCrossPositionBox.stateChanged.connect(self.crossDisplayCheck)
+		self.openDirectoryButton.clicked.connect(self.folderDialogue)
+		
 	def retranslateUi(self, MainWindow):
 		_translate = QtCore.QCoreApplication.translate
 		MainWindow.setWindowTitle(_translate("MainWindow", "Lucid GUI"))
@@ -638,6 +658,16 @@ class Ui_MainWindow(object):
 		else:
 			self.crossOffsetHBox.setEnabled(True)
 			self.crossOffsetWBox.setEnabled(True)
+			
+	def folderDialogue(self):
+		folder = str(QtWidgets.QFileDialog.getExistingDirectory(None, "Select Directory",snapshotDir))
+		if folder != '':
+			self.directoryBox.setText(folder)
+			self.snapshotDir = folder
+			f = open('lastDirectory.txt','w')
+			f.write(folder)
+			f.close()
+			
 if __name__ == "__main__":
 	import sys
 	app = QtWidgets.QApplication(sys.argv)
