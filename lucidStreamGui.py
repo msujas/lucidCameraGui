@@ -465,6 +465,7 @@ class Ui_MainWindow(object):
 		self.crossCheckBox.setGeometry(QtCore.QRect(labelxpos, 8*boxOffset + box1pos[1],int(10*scaling),int(10*scaling)))
 		self.crossCheckBox.setObjectName('crossCheckBox')
 		self.crossCheckBox.setText('display cross?')
+		self.crossCheckBox.setFont(labelfont)
 		self.crossCheckBox.setChecked(True)
 		self.crossCheckBox.adjustSize()
 
@@ -502,6 +503,7 @@ class Ui_MainWindow(object):
 		self.lockCrossPositionBox.setGeometry(QtCore.QRect(2*boxDimensions[0] + 40, int(8.9*boxOffset + box1pos[1]),int(10*scaling),int(10*scaling)))
 		self.lockCrossPositionBox.setObjectName('lockCrossPositionBox')
 		self.lockCrossPositionBox.setText('lock cross\nposition')
+		self.lockCrossPositionBox.setFont(labelfont)
 		self.lockCrossPositionBox.setChecked(True)
 		self.lockCrossPositionBox.adjustSize()
 
@@ -577,6 +579,7 @@ class Ui_MainWindow(object):
 		self.directoryLabel.setGeometry(QtCore.QRect(box1x, int(box1pos[1]+13.65*boxOffset),int(boxDimensions[0]*2),boxDimensions[1]))
 		self.directoryLabel.setObjectName('directoryLabel')
 		self.directoryLabel.setText('image directory')
+		self.directoryLabel.setFont(labelfont)
 		self.directoryLabel.adjustSize()
 
 
