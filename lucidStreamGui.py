@@ -35,7 +35,7 @@ if os.path.exists(logFile):
 
 class Worker(QtCore.QThread):
 	def __init__(self,width, height, ox, oy,monitorx, monitory,manualfps,fps, gainAuto, gain, fmt, screenwidth,
-	crosssize, crossOffsetH, crossOffsetW, crossCheck, imageTime):
+	crosssize, crossOffsetH, crossOffsetW, crossCheck, imageTime, imageDir):
 		super(Worker,self).__init__()
 		self.width = width
 		self.height = height
@@ -57,7 +57,7 @@ class Worker(QtCore.QThread):
 		self.snapshot = False
 		self.imageTime = imageTime
 		self.imageSeries = False
-
+		self.imageDir = imageDir
 	def run(self):
 		tries = 0
 		tries_max = 2
@@ -225,14 +225,14 @@ class Worker(QtCore.QThread):
 				#cv2.putText(resize, fps,textpos, cv2.FONT_HERSHEY_SIMPLEX, textsize, (100, 255, 0), 3, cv2.LINE_AA)
 				if self.snapshot:
 					dt = datetime.fromtimestamp(time.time())
-					filename = f'{snapshotDir}/{dt.day}_{dt.month}_{dt.year}_{dt.hour}{dt.minute}{dt.second}.png'
+					filename = f'{self.imageDir}/{dt.day:02d}_{dt.month:02d}_{dt.year}_{dt.hour:02d}{dt.minute:02d}{dt.second:02d}.png'
 					cv2.imwrite(filename, resize)
 					self.snapshot = False
 				if self.imageSeries:
 					currentTime = time.time()
 					if currentTime - imageCountDown >= self.imageTime:
 						dt = datetime.fromtimestamp(time.time())
-						filename = f'{snapshotDir}/{dt.day}_{dt.month}_{dt.year}_{dt.hour}{dt.minute}{dt.second}.png'
+						filename = f'{self.imageDir}/{dt.day:02d}_{dt.month:02d}_{dt.year}_{dt.hour:02d}{dt.minute:02d}{dt.second:02d}.png'
 						cv2.imwrite(filename, resize)
 						imageCountDown = time.time()
 				cv2.imshow(windowName,resize)
@@ -276,6 +276,8 @@ class Ui_MainWindow(object):
 		self.screen = QtWidgets.QApplication.primaryScreen().size()
 		self.screenwidth = self.screen.width()
 		self.screenheight = self.screen.height()
+		self.snapshotDir = snapshotDir
+
 		if self.screenheight > 2000:
 			monydefault = 2000
 		elif self.screenheight > 1400:
@@ -675,7 +677,7 @@ class Ui_MainWindow(object):
 
 		self.thread = Worker(width = width,height = height,ox = ox,oy = oy, monitorx = monitorx,monitory = monitory,
 		manualfps = manualfps,fps = fps,gainAuto = gainAuto,gain = gain, fmt = colourFormat, screenwidth = self.screenwidth,crosssize = crosssize,
-		crossOffsetH = crossOffsetH, crossOffsetW = crossOffsetW, crossCheck = crossCheck, imageTime = imageTime)
+		crossOffsetH = crossOffsetH, crossOffsetW = crossOffsetW, crossCheck = crossCheck, imageTime = imageTime, imageDir = self.snapshotDir)
 
 		self.thread.start()
 		self.runButton.setEnabled(False)
