@@ -474,7 +474,7 @@ class Ui_MainWindow(object):
 		self.crossOffsetHBox.setFont(boxfont)
 		self.crossOffsetHBox.setMinimum(-1500)
 		self.crossOffsetHBox.setMaximum(1500)
-		self.crossOffsetHBox.setValue(-50)
+		self.crossOffsetHBox.setValue(-96)
 
 		self.crossHLabel = QtWidgets.QLabel(self.centralwidget)
 		self.crossHLabel.setGeometry(QtCore.QRect(box1x, int(8.6*boxOffset + box1pos[1]), 81, 31))
@@ -489,7 +489,7 @@ class Ui_MainWindow(object):
 		self.crossOffsetWBox.setFont(boxfont)
 		self.crossOffsetWBox.setMinimum(-1500)
 		self.crossOffsetWBox.setMaximum(1500)
-		self.crossOffsetWBox.setValue(-100)
+		self.crossOffsetWBox.setValue(73)
 
 		self.crossWLabel = QtWidgets.QLabel(self.centralwidget)
 		self.crossWLabel.setGeometry(QtCore.QRect(30 + boxDimensions[0], int(8.6*boxOffset + box1pos[1]), 81, 31))
