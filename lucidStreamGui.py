@@ -164,7 +164,7 @@ class Worker(QtCore.QThread):
 		elif num_channels == 1:
 			crossElement = np.array([255],dtype = np.uint8)
 
-		imageCountDown = time.time() - self.imageTime
+		self.imageCountDown = 0
 		with device.start_stream():
 			"""
 			Infinitely fetch and display buffer data until esc is pressed
@@ -230,11 +230,11 @@ class Worker(QtCore.QThread):
 					self.snapshot = False
 				if self.imageSeries:
 					currentTime = time.time()
-					if currentTime - imageCountDown >= self.imageTime:
+					if currentTime - self.imageCountDown >= self.imageTime:
 						dt = datetime.fromtimestamp(time.time())
 						filename = f'{self.imageDir}/{dt.day:02d}_{dt.month:02d}_{dt.year}_{dt.hour:02d}{dt.minute:02d}{dt.second:02d}.png'
 						cv2.imwrite(filename, resize)
-						imageCountDown = time.time()
+						self.imageCountDown = time.time()
 				cv2.imshow(windowName,resize)
 
 				"""
@@ -710,6 +710,8 @@ class Ui_MainWindow(object):
 	def takeImageSeries(self):
 		if self.running:
 			self.thread.imageSeries = True
+			self.thread.imageTime = self.imageSeriesTime.value()
+			self.thread.imageCountDown = 0
 			self.imageSeriesButton.setEnabled(False)
 			self.imageSeriesStopButton.setEnabled(True)
 
