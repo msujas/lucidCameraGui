@@ -27,8 +27,9 @@ snapshotDir = f'{homepath}/{endpath}/'
 if not os.path.exists(snapshotDir):
 	os.makedirs(snapshotDir)
 
-if os.path.exists('lastDirectory.txt'):
-	f = open('lastDirectory.txt','r')
+logfile = 'lastDirectory.txt'
+if os.path.exists(logfile):
+	f = open(logfile,'r')
 	snapshotDir = f.read()
 	f.close()
 
@@ -664,7 +665,7 @@ class Ui_MainWindow(object):
 		if folder != '':
 			self.directoryBox.setText(folder)
 			self.snapshotDir = folder
-			f = open('lastDirectory.txt','w')
+			f = open(logfile,'w')
 			f.write(folder)
 			f.close()
 			
