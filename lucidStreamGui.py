@@ -34,8 +34,9 @@ if os.path.exists(logFile):
 	f.close()
 
 class Worker(QtCore.QThread):
-	def __init__(self,width, height, ox, oy,monitorx, monitory,manualfps,fps, gainAuto, gain, fmt, screenwidth,
-	crosssize, crossOffsetH, crossOffsetW, crossCheck, imageTime, imageDir):
+	def __init__(self,width: int, height: int, ox: int, oy: int,monitorx: int, monitory: int,manualfps: bool,fps: int, gainAuto: str, 
+	gain: float, fmt: str, screenwidth: int, crosssize: int, crossOffsetH: int, crossOffsetW: int, crossCheck: bool, imageTime: int, 
+	imageDir: str):
 		super(Worker,self).__init__()
 		self.width = width
 		self.height = height
