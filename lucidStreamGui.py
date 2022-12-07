@@ -16,7 +16,6 @@ import ctypes
 import numpy as np
 import cv2
 import time
-import matplotlib.pyplot as plt
 from datetime import datetime
 from pathlib import Path
 import os
@@ -741,6 +740,8 @@ class Ui_MainWindow(object):
 			f = open(logFile,'w')
 			f.write(folder)
 			f.close()
+			if self.running:
+				self.thread.imageDir = folder
 
 if __name__ == "__main__":
 	import sys
