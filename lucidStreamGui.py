@@ -35,7 +35,6 @@ if not os.path.exists(snapshotDir):
 class parAttributes():
 	def __init__(self, param):
 		self.param = param
-		pass
 	def name(self):
 		return self.objectName()
 	def parValue(self):
@@ -662,7 +661,7 @@ class Ui_MainWindow(object):
 		#	   self.manualFPSBox,self.FPSBox,self.xResBox,self.yResBox,self.xOffsetBox,self.yOffsetBox,self.directoryBox]
 		
 		self.updateParamDct()
-		self.settingsLog = 'lucidGUIconfiguration.log'
+		self.settingsLog = f'{os.path.dirname(os.path.realpath(__file__))}/lucidGUIconfiguration.log'
 		if os.path.exists(self.settingsLog):
 			self.readConfigLog()
 
