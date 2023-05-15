@@ -32,6 +32,22 @@ if not os.path.exists(snapshotDir):
 #	snapshotDir = f.read()
 #	f.close()
 
+class parAttributes():
+	def __init__(self, param):
+		self.param = param
+		pass
+	def name(self):
+		return self.objectName()
+	def parValue(self):
+		if type(self.param) == QtWidgets.QSpinBox or type(self.param) == QtWidgets.QDoubleSpinBox:
+			return self.param.value()
+		elif type(self.param) == QtWidgets.QComboBox:
+			return self.param.currentText()
+		elif type(self.param) == QtWidgets.QLineEdit:
+			return self.param.text()
+
+		
+
 class Worker(QtCore.QThread):
 	def __init__(self,width: int, height: int, ox: int, oy: int,monitorx: int, monitory: int,manualfps: bool,fps: int, gainAuto: str, 
 	gain: float, fmt: str, screenwidth: int, crosssize: int, crossOffsetH: int, crossOffsetW: int, crossCheck: bool, imageTime: int, 
@@ -607,6 +623,26 @@ class Ui_MainWindow(object):
 		QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
 		self.running = False
+		self.monitorxBox.setKeyboardTracking(False)
+		self.monitoryBox.setKeyboardTracking(False)
+		self.xResBox.setKeyboardTracking(False)
+		self.yResBox.setKeyboardTracking(False)
+		self.FPSBox.setKeyboardTracking(False)
+		self.gainBox.setKeyboardTracking(False)
+		self.crossSizeBox.setKeyboardTracking(False)
+		self.crossOffsetHBox.setKeyboardTracking(False)
+		self.crossOffsetWBox.setKeyboardTracking(False)
+		self.monitorxBox.valueChanged.connect(self.updateConfigLog)
+		self.monitoryBox.valueChanged.connect(self.updateConfigLog)
+		self.xResBox.valueChanged.connect(self.updateConfigLog)
+		self.yResBox.valueChanged.connect(self.updateConfigLog)
+		self.FPSBox.valueChanged.connect(self.updateConfigLog)
+		self.gainBox.valueChanged.connect(self.updateConfigLog)
+		self.crossSizeBox.valueChanged.connect(self.updateConfigLog)
+		self.crossOffsetHBox.valueChanged.connect(self.updateConfigLog)
+		self.crossOffsetWBox.valueChanged.connect(self.updateConfigLog)
+		self.colourBox.currentTextChanged.connect(self.updateConfigLog)
+		self.manualFPSBox.currentTextChanged.connect(self.updateConfigLog)
 		self.runButton.clicked.connect(self.start_worker)
 		self.stopButton.clicked.connect(self.stop_worker)
 		self.snapShotButton.clicked.connect(self.takeSingleImage)
@@ -615,25 +651,17 @@ class Ui_MainWindow(object):
 		self.gainBox.valueChanged.connect(self.changeGain)
 		self.crossSizeBox.valueChanged.connect(self.crossSizeChange)
 		self.crossOffsetHBox.valueChanged.connect(self.crossHChange)
+		self.crossOffsetHBox.valueChanged.connect(self.updateConfigLog)
 		self.crossOffsetWBox.valueChanged.connect(self.crossWChange)
+		self.crossOffsetWBox.valueChanged.connect(self.updateConfigLog)
 		self.lockCrossPositionBox.stateChanged.connect(self.crossDisplayCheck)
 		self.lockCrossPositionBox.stateChanged.connect(self.updateConfigLog)
 		self.openDirectoryButton.clicked.connect(self.folderDialogue)
 		
+		#self.paramConfigList = [self.crossOffsetHBox, self.crossOffsetWBox,self.monitorxBox,self.monitoryBox,self.colourBox,
+		#	   self.manualFPSBox,self.FPSBox,self.xResBox,self.yResBox,self.xOffsetBox,self.yOffsetBox,self.directoryBox]
 		
-
-		self.paramDct = {self.crossOffsetHBox.objectName(): [self.crossOffsetHBox,self.crossOffsetHBox.value()],
-						self.crossOffsetWBox.objectName(): [self.crossOffsetWBox,self.crossOffsetWBox.value()],
-						self.monitorxBox.objectName(): [self.monitorxBox,self.monitorxBox.value()],
-						self.monitoryBox.objectName(): [self.monitoryBox,self.monitoryBox.value()],
-						self.colourBox.objectName():[self.colourBox,self.colourBox.currentText()],
-						self.manualFPSBox.objectName():[self.manualFPSBox,self.manualFPSBox.currentText()],
-						self.FPSBox.objectName():[self.FPSBox,self.FPSBox.value()],
-						self.xResBox.objectName():[self.xResBox,self.xResBox.value()],
-						self.yResBox.objectName():[self.yResBox,self.yResBox.value()],
-						self.xOffsetBox.objectName():[self.xOffsetBox,self.xOffsetBox.value()],
-						self.yOffsetBox.objectName():[self.yOffsetBox,self.yOffsetBox.value()],
-						self.directoryBox.objectName():[self.directoryBox,self.directoryBox.text()]}
+		self.updateParamDct()
 		self.settingsLog = 'lucidGUIconfiguration.log'
 		if os.path.exists(self.settingsLog):
 			self.readConfigLog()
@@ -683,17 +711,17 @@ class Ui_MainWindow(object):
 		oy = self.yOffsetBox.value()
 		monitorx = self.monitorxBox.value()
 		monitory = self.monitoryBox.value()
-		if self.manualFPSBox.currentText() == 'True':
-			manualfps = True
-		elif self.manualFPSBox.currentText() == 'False':
-			manualfps = False
-		fps = self.FPSBox.value()
-		gainAuto = self.gainAutoBox.currentText()
-		gain = self.gainBox.value()
-		colourFormat = self.colourBox.currentText()
-
-		crosssize = self.crossSizeBox.value()
-		crossOffsetH = self.crossOffsetHBox.value()
+		if self.manualFPSBox.currentText() == 'True':		
+			manualfps = True		
+		elif self.manualFPSBox.currentText() == 'Fals		e':
+			manualfps = False		
+		fps = self.FPSBox.value()		
+		gainAuto = self.gainAutoBox.currentText()		
+		gain = self.gainBox.value()		
+		colourFormat = self.colourBox.currentText()		
+		
+		crosssize = self.crossSizeBox.value()		
+		crossOffsetH = self.crossOffsetHBox.value()		
 		crossOffsetW = self.crossOffsetWBox.value()
 		crossCheck = self.crossCheckBox.isChecked()
 		imageTime = self.imageSeriesTime.value()
@@ -713,7 +741,21 @@ class Ui_MainWindow(object):
 		self.imageSeriesButton.setEnabled(False)
 		self.imageSeriesStopButton.setEnabled(False)
 		self.running = False
-
+	def updateParamDct(self):
+		self.paramDct = {self.crossOffsetHBox.objectName(): [self.crossOffsetHBox,self.crossOffsetHBox.value()],
+						self.crossOffsetWBox.objectName(): [self.crossOffsetWBox,self.crossOffsetWBox.value()],
+						self.monitorxBox.objectName(): [self.monitorxBox,self.monitorxBox.value()],
+						self.monitoryBox.objectName(): [self.monitoryBox,self.monitoryBox.value()],
+						self.gainBox.objectName(): [self.gainBox,self.gainBox.value()],
+						self.crossSizeBox.objectName(): [self.crossSizeBox, self.crossSizeBox.value()] ,
+						self.colourBox.objectName():[self.colourBox,self.colourBox.currentText()],
+						self.manualFPSBox.objectName():[self.manualFPSBox,self.manualFPSBox.currentText()],
+						self.FPSBox.objectName():[self.FPSBox,self.FPSBox.value()],
+						self.xResBox.objectName():[self.xResBox,self.xResBox.value()],
+						self.yResBox.objectName():[self.yResBox,self.yResBox.value()],
+						self.xOffsetBox.objectName():[self.xOffsetBox,self.xOffsetBox.value()],
+						self.yOffsetBox.objectName():[self.yOffsetBox,self.yOffsetBox.value()],
+						self.directoryBox.objectName():[self.directoryBox,self.directoryBox.text()]}
 	def changeGain(self):
 		if self.running:
 			self.thread.gain = self.gainBox.value()
@@ -756,7 +798,7 @@ class Ui_MainWindow(object):
 
 
 	def folderDialogue(self):
-		folder = str(QtWidgets.QFileDialog.getExistingDirectory(None, "Select Directory",snapshotDir))
+		folder = str(QtWidgets.QFileDialog.getExistingDirectory(None, "Select Directory",self.directoryBox.text()))
 		if folder != '':
 			self.directoryBox.setText(folder)
 			self.snapshotDir = folder
@@ -767,18 +809,7 @@ class Ui_MainWindow(object):
 			if self.running:
 				self.thread.imageDir = folder
 	def updateConfigLog(self):
-		self.paramDct = {self.crossOffsetHBox.objectName(): [self.crossOffsetHBox,self.crossOffsetHBox.value()],
-				self.crossOffsetWBox.objectName(): [self.crossOffsetWBox,self.crossOffsetWBox.value()],
-				self.monitorxBox.objectName(): [self.monitorxBox,self.monitorxBox.value()],
-				self.monitoryBox.objectName(): [self.monitoryBox,self.monitoryBox.value()],
-				self.colourBox.objectName():[self.colourBox,self.colourBox.currentText()],
-				self.manualFPSBox.objectName():[self.manualFPSBox,self.manualFPSBox.currentText()],
-				self.FPSBox.objectName():[self.FPSBox,self.FPSBox.value()],
-				self.xResBox.objectName():[self.xResBox,self.xResBox.value()],
-				self.yResBox.objectName():[self.yResBox,self.yResBox.value()],
-				self.xOffsetBox.objectName():[self.xOffsetBox,self.xOffsetBox.value()],
-				self.yOffsetBox.objectName():[self.yOffsetBox,self.yOffsetBox.value()],
-				self.directoryBox.objectName():[self.directoryBox,self.directoryBox.text()]}
+		self.updateParamDct()
 		logUpdate = ''
 		for par in self.paramDct:
 			logUpdate += f'{par};{self.paramDct[par][1]}\n'
@@ -800,18 +831,7 @@ class Ui_MainWindow(object):
 				self.paramDct[parname][0].setText(parvalue)
 			elif type(self.paramDct[parname][0]) == QtWidgets.QComboBox:
 				self.paramDct[parname][0].setCurrentText(parvalue)
-		self.paramDct = {self.crossOffsetHBox.objectName(): [self.crossOffsetHBox,self.crossOffsetHBox.value()],
-						self.crossOffsetWBox.objectName(): [self.crossOffsetWBox,self.crossOffsetWBox.value()],
-						self.monitorxBox.objectName(): [self.monitorxBox,self.monitorxBox.value()],
-						self.monitoryBox.objectName(): [self.monitoryBox,self.monitoryBox.value()],
-						self.colourBox.objectName():[self.colourBox,self.colourBox.currentText()],
-						self.manualFPSBox.objectName():[self.manualFPSBox,self.manualFPSBox.currentText()],
-						self.FPSBox.objectName():[self.FPSBox,self.FPSBox.value()],
-						self.xResBox.objectName():[self.xResBox,self.xResBox.value()],
-						self.yResBox.objectName():[self.yResBox,self.yResBox.value()],
-						self.xOffsetBox.objectName():[self.xOffsetBox,self.xOffsetBox.value()],
-						self.yOffsetBox.objectName():[self.yOffsetBox,self.yOffsetBox.value()],
-						self.directoryBox.objectName():[self.directoryBox,self.directoryBox.text()]}		
+		self.updateParamDct()
 
 if __name__ == "__main__":
 	import sys
