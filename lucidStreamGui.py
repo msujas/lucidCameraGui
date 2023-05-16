@@ -20,17 +20,7 @@ from datetime import datetime
 from pathlib import Path
 import os
 
-homepath = str(Path.home())
-endpath = 'Documents/lucidSnapShots'
-snapshotDir = f'{homepath}/{endpath}/'
-if not os.path.exists(snapshotDir):
-	os.makedirs(snapshotDir)
 
-#logFile = 'lastDirectory.txt'
-#if os.path.exists(logFile):
-#	f = open(logFile,'r')
-#	snapshotDir = f.read()
-#	f.close()
 
 class parAttributes():
 	def __init__(self, param):
@@ -291,7 +281,7 @@ class Ui_MainWindow(object):
 		self.screen = QtWidgets.QApplication.primaryScreen().size()
 		self.screenwidth = self.screen.width()
 		self.screenheight = self.screen.height()
-		self.snapshotDir = snapshotDir
+
 
 		if self.screenheight > 2000:
 			monydefault = 2000
@@ -309,7 +299,12 @@ class Ui_MainWindow(object):
 		labelxpos = 20 + boxDimensions[0] + 10
 		box2x = int(20 + boxDimensions[0] + 10*scaling)
 		box1x = 20
-
+		homepath = str(Path.home())
+		endpath = 'Documents/lucidSnapShots'
+		self.snapshotDir = f'{homepath}/{endpath}/'
+		if not os.path.exists(self.snapshotDir):
+			os.makedirs(self.snapshotDir)
+		
 		basefont = int(12*scaling)
 
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -582,7 +577,7 @@ class Ui_MainWindow(object):
 		self.directoryBox.setGeometry(QtCore.QRect(box1x, int(box1pos[1]+14*boxOffset),int(boxDimensions[0]*2),boxDimensions[1]))
 		self.directoryBox.setObjectName("directoryBox")
 		self.directoryBox.setFont(boxfont)
-		self.directoryBox.setText(snapshotDir)
+		self.directoryBox.setText(self.snapshotDir)
 
 		self.openDirectoryButton = QtWidgets.QPushButton(self.centralwidget)
 		self.openDirectoryButton.setGeometry(QtCore.QRect(int(box1x + 10*scaling + boxDimensions[0]*2), int(box1pos[1]+14*boxOffset),boxDimensions[1],boxDimensions[1]))
@@ -712,7 +707,7 @@ class Ui_MainWindow(object):
 		monitory = self.monitoryBox.value()
 		if self.manualFPSBox.currentText() == 'True':		
 			manualfps = True		
-		elif self.manualFPSBox.currentText() == 'Fals		e':
+		elif self.manualFPSBox.currentText() == 'False':
 			manualfps = False		
 		fps = self.FPSBox.value()		
 		gainAuto = self.gainAutoBox.currentText()		
