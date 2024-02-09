@@ -45,7 +45,7 @@ class parAttributes():
 
 class Worker(QtCore.QThread):
 	def __init__(self,width: int, height: int, ox: int, oy: int,monitorx: int, monitory: int,manualfps: bool,fps: int, gainAuto: str, 
-	gain: float, fmt: str, screenwidth: int, crosssize: int, crossOffsetH: int, crossOffsetW: int, crossCheck: bool, linePosition: int, 
+	gain: float, fmt: str, screenwidth: int, screenheight: int, crosssize: int, crossOffsetH: int, crossOffsetW: int, crossCheck: bool, linePosition: int, 
 	imageTime: int, imageDir: str, record: bool = False, recordTime: int = 1, lineCheck: bool = True):
 		super(Worker,self).__init__()
 		self.width = width
@@ -60,6 +60,7 @@ class Worker(QtCore.QThread):
 		self.gainAuto = gainAuto
 		self.gain = gain
 		self.screenwidth = screenwidth
+		self.screenheight = screenheight
 		self.crosssize = crosssize
 		self.crossOffsetH = crossOffsetH
 		self.crossOffsetW = crossOffsetW
@@ -176,7 +177,7 @@ class Worker(QtCore.QThread):
 		print(f'monitorx {self.monitorx}, monitory {self.monitory}')
 		windowName = 'Lucid (press stop to close)'
 		cv2.namedWindow(windowName)
-		cv2.moveWindow(windowName,self.screenwidth-self.monitorx,0)
+		cv2.moveWindow(windowName,self.screenwidth-self.monitorx,self.screenheight - self.monitory-100)
 		if num_channels == 3:
 			crossElement = np.array([0,0,255], dtype = np.uint8)
 		elif num_channels == 1:
@@ -764,9 +765,9 @@ class Ui_MainWindow(object):
 		imageTime = self.imageSeriesTime.value()
 
 		self.thread = Worker(width = width,height = height,ox = ox,oy = oy, monitorx = monitorx,monitory = monitory,
-		manualfps = manualfps,fps = fps,gainAuto = gainAuto,gain = gain, fmt = colourFormat, screenwidth = self.screenwidth,crosssize = crosssize,
-		crossOffsetH = crossOffsetH, crossOffsetW = crossOffsetW, crossCheck = crossCheck, imageTime = imageTime, imageDir = self.snapshotDir,
-		lineCheck=self.lineCheckBox.isChecked(), linePosition=self.linePositionBox.value())
+		manualfps = manualfps,fps = fps,gainAuto = gainAuto,gain = gain, fmt = colourFormat, screenwidth = self.screenwidth, screenheight=self.screenheight,
+		crosssize = crosssize,crossOffsetH = crossOffsetH, crossOffsetW = crossOffsetW, crossCheck = crossCheck, imageTime = imageTime, 
+		imageDir = self.snapshotDir,lineCheck=self.lineCheckBox.isChecked(), linePosition=self.linePositionBox.value())
 
 		self.thread.start()
 		self.runButton.setEnabled(False)
