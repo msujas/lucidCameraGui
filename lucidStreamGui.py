@@ -177,7 +177,7 @@ class Worker(QtCore.QThread):
 		print(f'monitorx {self.monitorx}, monitory {self.monitory}')
 		windowName = 'Lucid (press stop to close)'
 		cv2.namedWindow(windowName)
-		cv2.moveWindow(windowName,self.screenwidth-self.monitorx - 100,self.screenheight - self.monitory-100)
+		cv2.moveWindow(windowName,self.screenwidth-self.monitorx - 20,self.screenheight - self.monitory-80)
 		if num_channels == 3:
 			crossElement = np.array([0,0,255], dtype = np.uint8)
 		elif num_channels == 1:
