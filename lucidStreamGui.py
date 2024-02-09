@@ -147,7 +147,7 @@ class Worker(QtCore.QThread):
 
 		aspect = nodes['Width'].value/nodes['Height'].value
 
-		crossThickness = 5
+		crossThickness = 3
 		lineSize = 300
 		lineThickness = 3
 
@@ -181,8 +181,7 @@ class Worker(QtCore.QThread):
 			crossElement = np.array([0,0,255], dtype = np.uint8)
 		elif num_channels == 1:
 			crossElement = np.array([255],dtype = np.uint8)
-		recorder = Recorder(self.monitorx,self.monitory,tl_stream_nodemap['AcquisitionFrameRate'].value)
-		recorder.codec = ('h264', 'mp4', 'bgr8')
+
 		self.imageCountDown = 0
 		with device.start_stream():
 			"""
@@ -242,8 +241,7 @@ class Worker(QtCore.QThread):
 					npndarray[self.linePosition:self.linePosition+lineThickness,self.crossOffsetW+ int(self.width/2-lineSize/2 + 1):self.crossOffsetW+ int(self.width/2+lineSize/2)] = crossElement
 				#fps = str(1/(curr_frame_time - prev_frame_time))
 				resize = cv2.resize(npndarray,(self.monitorx,self.monitory))
-				if self.record:
-					recorder.append(resize)
+
 				#cv2.putText(resize, fps,textpos, cv2.FONT_HERSHEY_SIMPLEX, textsize, (100, 255, 0), 3, cv2.LINE_AA)
 				if self.snapshot:
 					dt = datetime.fromtimestamp(time.time())
