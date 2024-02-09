@@ -239,7 +239,7 @@ class Worker(QtCore.QThread):
 					npndarray[self.crossOffsetH + int(self.height/2+self.crosssize/2-crossThickness):  self.crossOffsetH + int(self.height/2+self.crosssize/2),
 					self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2+self.crosssize/2)] = crossElement #upper horizontal
 				if self.lineCheck:
-					npndarray[self.linePosition:self.linePosition+lineThickness,self.crossOffsetW+ int(self.width/2-lineSize/2 + 1):self.crossOffsetW+ int(self.width/2+lineSize/2)]
+					npndarray[self.linePosition:self.linePosition+lineThickness,self.crossOffsetW+ int(self.width/2-lineSize/2 + 1):self.crossOffsetW+ int(self.width/2+lineSize/2)] = crossElement
 				#fps = str(1/(curr_frame_time - prev_frame_time))
 				resize = cv2.resize(npndarray,(self.monitorx,self.monitory))
 				if self.record:
