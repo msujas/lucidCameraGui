@@ -11,6 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from arena_api.system import system
 from arena_api.buffer import *
 import arena_api.enums as enums
+from arena_api.__future__.save import Recorder
 
 import ctypes
 import numpy as np
@@ -21,6 +22,11 @@ from pathlib import Path
 import os
 
 
+def stringToBool(string):
+	if string == 'True':
+		return True
+	else:
+		return False
 
 class parAttributes():
 	def __init__(self, param):
@@ -39,8 +45,8 @@ class parAttributes():
 
 class Worker(QtCore.QThread):
 	def __init__(self,width: int, height: int, ox: int, oy: int,monitorx: int, monitory: int,manualfps: bool,fps: int, gainAuto: str, 
-	gain: float, fmt: str, screenwidth: int, crosssize: int, crossOffsetH: int, crossOffsetW: int, crossCheck: bool, imageTime: int, 
-	imageDir: str):
+	gain: float, fmt: str, screenwidth: int, crosssize: int, crossOffsetH: int, crossOffsetW: int, crossCheck: bool, linePosition: int, 
+	imageTime: int, imageDir: str, record: bool = False, recordTime: int = 1, lineCheck: bool = True):
 		super(Worker,self).__init__()
 		self.width = width
 		self.height = height
@@ -63,6 +69,11 @@ class Worker(QtCore.QThread):
 		self.imageTime = imageTime
 		self.imageSeries = False
 		self.imageDir = imageDir
+		self.record = record
+		self.recordTime = recordTime
+		self.linePosition = linePosition
+		self.lineCheck = lineCheck
+
 	def run(self):
 		tries = 0
 		tries_max = 2
@@ -136,7 +147,9 @@ class Worker(QtCore.QThread):
 
 		aspect = nodes['Width'].value/nodes['Height'].value
 
-		crossThickness = 10
+		crossThickness = 5
+		lineSize = 300
+		lineThickness = 3
 
 
 		if self.monitorx/self.monitory < aspect: #adjusting the monitor x or y values based on the aspect ratio
@@ -168,7 +181,8 @@ class Worker(QtCore.QThread):
 			crossElement = np.array([0,0,255], dtype = np.uint8)
 		elif num_channels == 1:
 			crossElement = np.array([255],dtype = np.uint8)
-
+		recorder = Recorder(self.monitorx,self.monitory,tl_stream_nodemap['AcquisitionFrameRate'].value)
+		recorder.codec = ('h264', 'mp4', 'bgr8')
 		self.imageCountDown = 0
 		with device.start_stream():
 			"""
@@ -224,9 +238,12 @@ class Worker(QtCore.QThread):
 
 					npndarray[self.crossOffsetH + int(self.height/2+self.crosssize/2-crossThickness):  self.crossOffsetH + int(self.height/2+self.crosssize/2),
 					self.crossOffsetW+ int(self.width/2-self.crosssize/2 + 1):self.crossOffsetW+int(self.width/2+self.crosssize/2)] = crossElement #upper horizontal
+				if self.lineCheck:
+					npndarray[self.linePosition:self.linePosition+lineThickness,self.crossOffsetW+ int(self.width/2-lineSize/2 + 1):self.crossOffsetW+ int(self.width/2+lineSize/2)]
 				#fps = str(1/(curr_frame_time - prev_frame_time))
 				resize = cv2.resize(npndarray,(self.monitorx,self.monitory))
-
+				if self.record:
+					recorder.append(resize)
 				#cv2.putText(resize, fps,textpos, cv2.FONT_HERSHEY_SIMPLEX, textsize, (100, 255, 0), 3, cv2.LINE_AA)
 				if self.snapshot:
 					dt = datetime.fromtimestamp(time.time())
@@ -290,7 +307,7 @@ class Ui_MainWindow(object):
 		else:
 			monydefault = 900
 		scaling = (self.screenwidth/1920)**0.5 #scaling box and font sizes for different screen resolutions
-		windowsize = [int(280*scaling),int(650*scaling)]
+		windowsize = [int(280*scaling),int(700*scaling)]
 		MainWindow.resize(*windowsize)
 		MainWindow.move(0,self.screenheight - windowsize[1] - 75)
 		box1pos = [int(20*scaling), int(35*scaling)]
@@ -485,7 +502,7 @@ class Ui_MainWindow(object):
 		self.crossOffsetHBox.setFont(boxfont)
 		self.crossOffsetHBox.setMinimum(-1500)
 		self.crossOffsetHBox.setMaximum(1500)
-		self.crossOffsetHBox.setValue(-96)
+		self.crossOffsetHBox.setValue(0)
 
 		self.crossHLabel = QtWidgets.QLabel(self.centralwidget)
 		self.crossHLabel.setGeometry(QtCore.QRect(box1x, int(8.6*boxOffset + box1pos[1]), 81, 31))
@@ -500,7 +517,7 @@ class Ui_MainWindow(object):
 		self.crossOffsetWBox.setFont(boxfont)
 		self.crossOffsetWBox.setMinimum(-1500)
 		self.crossOffsetWBox.setMaximum(1500)
-		self.crossOffsetWBox.setValue(73)
+		self.crossOffsetWBox.setValue(0)
 
 		self.crossWLabel = QtWidgets.QLabel(self.centralwidget)
 		self.crossWLabel.setGeometry(QtCore.QRect(30 + boxDimensions[0], int(8.6*boxOffset + box1pos[1]), 81, 31))
@@ -592,6 +609,34 @@ class Ui_MainWindow(object):
 		self.directoryLabel.setFont(labelfont)
 		self.directoryLabel.adjustSize()
 
+		self.linePositionLabel = QtWidgets.QLabel(self.centralwidget)
+		self.linePositionLabel.setGeometry(QtCore.QRect(box1x, int(14.7*boxOffset + box1pos[1]),*boxDimensions))
+		self.linePositionLabel.setObjectName('linePositionLabel')
+		self.linePositionLabel.setText('line position')
+		self.linePositionLabel.setFont(labelfont)
+		self.linePositionLabel.adjustSize()
+
+		self.linePositionBox =	 QtWidgets.QSpinBox(self.centralwidget) #select the size of the cross that is overlayed on the image
+		self.linePositionBox.setGeometry(QtCore.QRect(box1x, 15*boxOffset + box1pos[1],*boxDimensions))
+		self.linePositionBox.setObjectName("linePositionBox")
+		self.linePositionBox.setFont(boxfont)
+		self.linePositionBox.setMinimum(0)
+		self.linePositionBox.setMaximum(3000)
+		self.linePositionBox.setValue(1800)
+		self.linePositionBox.setSingleStep(1)
+		self.linePositionBox.setKeyboardTracking(False)
+		self.linePositionBox.valueChanged.connect(self.linePositionChange)
+		self.linePositionBox.valueChanged.connect(self.updateConfigLog)
+
+		self.lineCheckBox =  QtWidgets.QCheckBox(self.centralwidget) #select whether or not to display the cross
+		self.lineCheckBox.setGeometry(QtCore.QRect(labelxpos, 15*boxOffset + box1pos[1],int(10*scaling),int(10*scaling)))
+		self.lineCheckBox.setObjectName('lineCheckBox')
+		self.lineCheckBox.setText('display line?')
+		self.lineCheckBox.setFont(labelfont)
+		self.lineCheckBox.setChecked(True)
+		self.lineCheckBox.adjustSize()
+		self.lineCheckBox.stateChanged.connect(self.lineCheckChange)
+		self.lineCheckBox.stateChanged.connect(self.updateConfigLog)
 
 		MainWindow.setCentralWidget(self.centralwidget)
 		MainWindow.setCentralWidget(self.centralwidget)
@@ -722,7 +767,8 @@ class Ui_MainWindow(object):
 
 		self.thread = Worker(width = width,height = height,ox = ox,oy = oy, monitorx = monitorx,monitory = monitory,
 		manualfps = manualfps,fps = fps,gainAuto = gainAuto,gain = gain, fmt = colourFormat, screenwidth = self.screenwidth,crosssize = crosssize,
-		crossOffsetH = crossOffsetH, crossOffsetW = crossOffsetW, crossCheck = crossCheck, imageTime = imageTime, imageDir = self.snapshotDir)
+		crossOffsetH = crossOffsetH, crossOffsetW = crossOffsetW, crossCheck = crossCheck, imageTime = imageTime, imageDir = self.snapshotDir,
+		lineCheck=self.lineCheckBox.isChecked(), linePosition=self.linePositionBox.value())
 
 		self.thread.start()
 		self.runButton.setEnabled(False)
@@ -749,7 +795,9 @@ class Ui_MainWindow(object):
 						self.yResBox.objectName():[self.yResBox,self.yResBox.value()],
 						self.xOffsetBox.objectName():[self.xOffsetBox,self.xOffsetBox.value()],
 						self.yOffsetBox.objectName():[self.yOffsetBox,self.yOffsetBox.value()],
-						self.directoryBox.objectName():[self.directoryBox,self.directoryBox.text()]}
+						self.directoryBox.objectName():[self.directoryBox,self.directoryBox.text()],
+						self.linePositionBox.objectName():[self.linePositionBox,self.linePositionBox.value()],
+						self.lineCheckBox.objectName():[self.lineCheckBox,self.lineCheckBox.isChecked()]}
 	def changeGain(self):
 		if self.running:
 			self.thread.gain = self.gainBox.value()
@@ -763,6 +811,14 @@ class Ui_MainWindow(object):
 	def crossWChange(self):
 		if self.running:
 			self.thread.crossOffsetW = self.crossOffsetWBox.value()
+	
+	def linePositionChange(self):
+		if self.running:
+			self.thread.linePosition = self.linePositionBox.value()
+	
+	def lineCheckChange(self):
+		if self.running:
+			self.thread.lineCheck = self.lineCheckBox.isChecked()
 
 	def takeSingleImage(self):
 		if self.running:
@@ -825,6 +881,8 @@ class Ui_MainWindow(object):
 				self.paramDct[parname][0].setText(parvalue)
 			elif type(self.paramDct[parname][0]) == QtWidgets.QComboBox:
 				self.paramDct[parname][0].setCurrentText(parvalue)
+			elif type(self.paramDct[parname][0]) == QtWidgets.QCheckBox:
+				self.paramDct[parname][0].setChecked(stringToBool(parvalue))
 		self.updateParamDct()
 
 if __name__ == "__main__":
