@@ -147,7 +147,7 @@ class Worker(QtCore.QThread):
 
 		aspect = nodes['Width'].value/nodes['Height'].value
 
-		crossThickness = 3
+		crossThickness = 4
 		lineSize = 300
 		lineThickness = 3
 
