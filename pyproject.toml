@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools >= 59.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lucidCameraGUI"
+version = "1.0"
+requires-python = ">= 3.8"
+dependencies = ["opencv-python",
+                "numpy",
+                "PyQt5"]
+authors = [{name = "Kenneth P. Marshall", email = "kenneth.marshall@esrf.fr"}]
+maintainers = [{name = "Kenneth P. Marshall", email = "kenneth.marshall@esrf.fr"}]
+description = "A GUI for running a LucidVision camera"
+readme = {file = "README.MD", content-type = "text/markdown"}
+keywords = ["Lucid Vision", "ArenaView", "gui"]
+classifiers = [
+"Development Status :: 4 - Beta",
+"Programming Language :: Python :: 3.8",
+"Programming Language :: Python :: 3.9",
+"Programming Language :: Python :: 3.10",
+"Programming Language :: Python :: 3.11",
+"Programming Language :: Python :: 3.12"]
+
+[project.scripts]
+lucidCameraGUI = "lucidCameraGui.lucidStreamGui:main"
+
+[tool.setuptools]
+packages = ["lucidCameraGui"]
+
+[project.urls]
+repository = "https://github.com/msujas/lucidCameraGui"
