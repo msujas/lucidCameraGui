@@ -188,6 +188,9 @@ class Worker(QtCore.QThread):
 			"""
 			Infinitely fetch and display buffer data until esc is pressed
 			"""
+			frameCount = 0
+			fpsCheckCount = 0
+			t0 = time.time()
 
 			while self.running:
 				# Used to display FPS on stream
@@ -262,9 +265,19 @@ class Worker(QtCore.QThread):
 				Destroy the copied item to prevent memory leaks
 				"""
 				BufferFactory.destroy(item)
-				cycletimes = np.append(cycletimes,curr_frame_time-prev_frame_time)
+				#cycletimes = np.append(cycletimes,curr_frame_time-prev_frame_time)
+				if frameCount >= 100:
+					time100 = time.time() - t0
+					fps = 100/time100
+					if fpsCheckCount == 0:
+						totalFPS = fps
+					else:
+						totalFPS = (fps*fpsCheckCount+fps)/(fpsCheckCount+1)
+					frameCount = 0
+					t0 = time.time()
+					fpsCheckCount += 1
 				prev_frame_time = curr_frame_time
-
+				frameCount += 1
 
 				"""
 				Break if esc key is pressed
@@ -279,14 +292,15 @@ class Worker(QtCore.QThread):
 
 		system.destroy_device()
 		#print(1/np.average(buffertimes))
-		cycletimes = cycletimes[1:]
-		print(f'fps = {1/np.average(cycletimes)}, standard deviation = {np.std(1/cycletimes)}')
+		#cycletimes = cycletimes[1:]
+		#print(f'fps = {1/np.average(cycletimes)}, standard deviation = {np.std(1/cycletimes)}')
+		print(f'fps = {totalFPS}')
 		return
 
 	def stop(self):
 		self.running = False
 		print('stopping process')
-		#self.terminate()
+		self.terminate()
 
 
 
@@ -700,7 +714,9 @@ class Ui_MainWindow(object):
 		#	   self.manualFPSBox,self.FPSBox,self.xResBox,self.yResBox,self.xOffsetBox,self.yOffsetBox,self.directoryBox]
 		
 		self.updateParamDct()
-		self.settingsLog = f'{os.path.dirname(os.path.realpath(__file__))}/lucidGUIconfiguration.log'
+		self.settingsLog = f'{homepath}/lucidGUIConfig/lucidGUIconfiguration.log'
+		if not os.path.exists(os.path.dirname(self.settingsLog)):
+			os.makedirs(os.path.dirname(self.settingsLog))
 		if os.path.exists(self.settingsLog):
 			self.readConfigLog()
 
