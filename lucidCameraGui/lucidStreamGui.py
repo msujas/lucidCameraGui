@@ -300,7 +300,7 @@ class Worker(QtCore.QThread):
 	def stop(self):
 		self.running = False
 		print('stopping process')
-		self.terminate()
+		#self.terminate()
 
 
 
