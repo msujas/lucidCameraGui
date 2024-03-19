@@ -191,6 +191,7 @@ class Worker(QtCore.QThread):
 			frameCount = 0
 			fpsCheckCount = 0
 			t0 = time.time()
+			totalFPS = 0
 
 			while self.running:
 				# Used to display FPS on stream
