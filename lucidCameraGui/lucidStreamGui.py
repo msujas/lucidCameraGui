@@ -182,7 +182,7 @@ class Worker(QtCore.QThread):
 			crossElement = np.array([0,0,255], dtype = np.uint8)
 		elif num_channels == 1:
 			crossElement = np.array([255],dtype = np.uint8)
-
+		self.gaincheck = False
 		self.imageCountDown = 0
 		with device.start_stream():
 			"""
@@ -192,11 +192,13 @@ class Worker(QtCore.QThread):
 			fpsCheckCount = 0
 			t0 = time.time()
 			totalFPS = 0
-
+			fpsCheckFreq = 10
 			while self.running:
 				# Used to display FPS on stream
 				curr_frame_time = time.time()
-				nodes['Gain'].value = self.gain
+				if self.gaincheck:
+					nodes['Gain'].value = self.gain
+					self.gaincheck = False
 				buffer = device.get_buffer()
 
 
@@ -267,9 +269,9 @@ class Worker(QtCore.QThread):
 				"""
 				BufferFactory.destroy(item)
 				#cycletimes = np.append(cycletimes,curr_frame_time-prev_frame_time)
-				if frameCount >= 100:
-					time100 = time.time() - t0
-					fps = 100/time100
+				if frameCount >= fpsCheckFreq:
+					timeCheck = time.time() - t0
+					fps = fpsCheckFreq/timeCheck
 					if fpsCheckCount == 0:
 						totalFPS = fps
 					else:
@@ -817,6 +819,7 @@ class Ui_MainWindow(object):
 	def changeGain(self):
 		if self.running:
 			self.thread.gain = self.gainBox.value()
+			self.thread.gaincheck = True
 	def crossSizeChange(self):
 		if self.running:
 			self.thread.crosssize = self.crossSizeBox.value()
