@@ -4,4 +4,5 @@ On Pypi: run 'pip install lucidCameraGUI'. This should create a python executabl
 
 Options include selecting the camera resolution, offsets (if using lower than max. resolution), gain, the size of the displayed image on the monitor, Mono8 or BGR8 colour formats, whether to overlay a red cross on the image (and to adjust the size and position of the cross) for e.g. centering a capillary.
 
-![image](https://github.com/msujas/lucidCameraGui/assets/79653376/c6c1bcf4-271a-43bc-aa92-8d84a8ad4fb6)
+![image](https://github.com/user-attachments/assets/4580f7f1-b1ce-4d44-8251-4f1778f31991)
+
