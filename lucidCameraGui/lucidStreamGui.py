@@ -712,6 +712,7 @@ class Ui_MainWindow(object):
 		self.lockCrossPositionBox.stateChanged.connect(self.crossDisplayCheck)
 		self.lockCrossPositionBox.stateChanged.connect(self.updateConfigLog)
 		self.openDirectoryButton.clicked.connect(self.folderDialogue)
+		self.crossCheckBox.stateChanged.connect(self.changeCrossDisplay)
 		
 		#self.paramConfigList = [self.crossOffsetHBox, self.crossOffsetWBox,self.monitorxBox,self.monitoryBox,self.colourBox,
 		#	   self.manualFPSBox,self.FPSBox,self.xResBox,self.yResBox,self.xOffsetBox,self.yOffsetBox,self.directoryBox]
@@ -863,6 +864,10 @@ class Ui_MainWindow(object):
 		else:
 			self.crossOffsetHBox.setEnabled(True)
 			self.crossOffsetWBox.setEnabled(True)
+
+	def changeCrossDisplay(self):
+		if self.running:
+			self.thread.crossCheck = self.crossCheckBox.isChecked()
 
 
 
