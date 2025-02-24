@@ -27,6 +27,17 @@ def stringToBool(string):
 		return True
 	else:
 		return False
+	
+def shrinkImageSave(filename, array, factor):
+	leny = array.shape[0]
+	lenx = array.shape[1]
+	newy = int(leny/(factor**0.5))
+	newx = int(lenx/(factor**0.5))
+	resize = cv2.resize(array,(newy,newx))
+	cv2.imwrite(filename, resize)
+
+
+
 
 class parAttributes():
 	def __init__(self, param):
@@ -46,7 +57,7 @@ class parAttributes():
 class Worker(QtCore.QThread):
 	def __init__(self,width: int, height: int, ox: int, oy: int,monitorx: int, monitory: int,manualfps: bool,fps: int, gainAuto: str, 
 	gain: float, fmt: str, screenwidth: int, screenheight: int, crosssize: int, crossOffsetH: int, crossOffsetW: int, crossCheck: bool, linePosition: int, 
-	imageTime: int, imageDir: str, record: bool = False, recordTime: int = 1, lineCheck: bool = True):
+	imageTime: int, imageDir: str, record: bool = False, recordTime: int = 1, lineCheck: bool = True, imageSaveFactor = 1):
 		super(Worker,self).__init__()
 		self.width = width
 		self.height = height
@@ -74,6 +85,7 @@ class Worker(QtCore.QThread):
 		self.recordTime = recordTime
 		self.linePosition = linePosition
 		self.lineCheck = lineCheck
+		self.saveImageFactor = imageSaveFactor
 
 	def run(self):
 		tries = 0
@@ -96,8 +108,7 @@ class Worker(QtCore.QThread):
 				break
 
 		else:
-			print(f'No device found! Please connect a device and run '
-							f'the example again.')
+			print(f'No device found! Please connect a device and run again')
 			return
 		nodemap = device.nodemap
 		nodes = nodemap.get_node(['Width', 'Height', 'PixelFormat','OffsetX','OffsetY', 'AcquisitionFrameRateEnable', 'AcquisitionFrameRate','GainAuto', 'Gain'])
@@ -251,16 +262,12 @@ class Worker(QtCore.QThread):
 
 				#cv2.putText(resize, fps,textpos, cv2.FONT_HERSHEY_SIMPLEX, textsize, (100, 255, 0), 3, cv2.LINE_AA)
 				if self.snapshot:
-					dt = datetime.fromtimestamp(time.time())
-					filename = f'{self.imageDir}/{dt.day:02d}_{dt.month:02d}_{dt.year}_{dt.hour:02d}{dt.minute:02d}{dt.second:02d}.png'
-					cv2.imwrite(filename, resize)
+					self.saveImage(resize)
 					self.snapshot = False
 				if self.imageSeries:
 					currentTime = time.time()
 					if currentTime - self.imageCountDown >= self.imageTime:
-						dt = datetime.fromtimestamp(time.time())
-						filename = f'{self.imageDir}/{dt.day:02d}_{dt.month:02d}_{dt.year}_{dt.hour:02d}{dt.minute:02d}{dt.second:02d}.png'
-						cv2.imwrite(filename, resize)
+						self.saveImage(resize)
 						self.imageCountDown = time.time()
 				cv2.imshow(windowName,resize)
 
@@ -304,6 +311,14 @@ class Worker(QtCore.QThread):
 		self.running = False
 		print('stopping process')
 		#self.terminate()
+
+	def saveImage(self, array):
+		dt = datetime.fromtimestamp(time.time())
+		filename = f'{self.imageDir}/{dt.year}_{dt.month:02d}_{dt.day:02d}_{dt.hour:02d}{dt.minute:02d}{dt.second:02d}.png'
+		if self.saveImageFactor > 1:
+			shrinkImageSave(filename, array,self.saveImageFactor)
+		else:
+			cv2.imwrite(filename, array)
 
 
 
@@ -598,6 +613,21 @@ class Ui_MainWindow(object):
 		self.imageSeriesTimeLabel.setText('series time period\n(seconds)')
 		self.imageSeriesTimeLabel.adjustSize()
 
+		self.saveImageShrinkBox = QtWidgets.QSpinBox(self.centralwidget)
+		self.saveImageShrinkBox.setGeometry(QtCore.QRect(int(box2x + 10*scaling), int(12.8*boxOffset + box1pos[1]), int(50*scaling), boxDimensions[1]))
+		self.saveImageShrinkBox.setFont(labelfont)
+		self.saveImageShrinkBox.setObjectName("saveImageShrinkBox")
+		self.saveImageShrinkBox.setProperty('value',1)
+		self.saveImageShrinkBox.setMinimum(1)
+		self.saveImageShrinkBox.setMaximum(10)
+		
+		self.saveImageShrinkLabel = QtWidgets.QLabel(self.centralwidget)
+		self.saveImageShrinkLabel.setGeometry(QtCore.QRect(int(box2x + 70*scaling), int(12.8*boxOffset + box1pos[1]), int(60*scaling), int(40*scaling)))
+		self.saveImageShrinkLabel.setFont(labelfont)
+		self.saveImageShrinkLabel.setObjectName("saveImageShrinkLabel")
+		self.saveImageShrinkLabel.setText('save image\nshrink factor')
+		self.saveImageShrinkLabel.adjustSize()
+
 		self.imageSeriesStopButton = QtWidgets.QPushButton(self.centralwidget)
 		self.imageSeriesStopButton.setGeometry(QtCore.QRect(box1x, int(12.8*boxOffset + box1pos[1]), int(130*scaling), int(40*scaling)))
 		self.imageSeriesStopButton.setFont(labelfont)
@@ -713,6 +743,7 @@ class Ui_MainWindow(object):
 		self.lockCrossPositionBox.stateChanged.connect(self.updateConfigLog)
 		self.openDirectoryButton.clicked.connect(self.folderDialogue)
 		self.crossCheckBox.stateChanged.connect(self.changeCrossDisplay)
+		self.saveImageShrinkBox.valueChanged.connect(self.changeImageSaveFactor)
 		
 		#self.paramConfigList = [self.crossOffsetHBox, self.crossOffsetWBox,self.monitorxBox,self.monitoryBox,self.colourBox,
 		#	   self.manualFPSBox,self.FPSBox,self.xResBox,self.yResBox,self.xOffsetBox,self.yOffsetBox,self.directoryBox]
@@ -776,7 +807,7 @@ class Ui_MainWindow(object):
 		fps = self.FPSBox.value()		
 		gainAuto = self.gainAutoBox.currentText()		
 		gain = self.gainBox.value()		
-		colourFormat = self.colourBox.currentText()		
+		colourFormat = self.colourBox.currentText()	
 		
 		crosssize = self.crossSizeBox.value()		
 		crossOffsetH = self.crossOffsetHBox.value()		
@@ -787,7 +818,8 @@ class Ui_MainWindow(object):
 		self.thread = Worker(width = width,height = height,ox = ox,oy = oy, monitorx = monitorx,monitory = monitory,
 		manualfps = manualfps,fps = fps,gainAuto = gainAuto,gain = gain, fmt = colourFormat, screenwidth = self.screenwidth, screenheight=self.screenheight,
 		crosssize = crosssize,crossOffsetH = crossOffsetH, crossOffsetW = crossOffsetW, crossCheck = crossCheck, imageTime = imageTime, 
-		imageDir = self.snapshotDir,lineCheck=self.lineCheckBox.isChecked(), linePosition=self.linePositionBox.value())
+		imageDir = self.snapshotDir,lineCheck=self.lineCheckBox.isChecked(), linePosition=self.linePositionBox.value(), 
+		imageSaveFactor=self.saveImageShrinkBox.value())
 
 		self.thread.start()
 		self.runButton.setEnabled(False)
@@ -817,6 +849,11 @@ class Ui_MainWindow(object):
 						self.directoryBox.objectName():[self.directoryBox,self.directoryBox.text()],
 						self.linePositionBox.objectName():[self.linePositionBox,self.linePositionBox.value()],
 						self.lineCheckBox.objectName():[self.lineCheckBox,self.lineCheckBox.isChecked()]}
+		
+	def changeImageSaveFactor(self):
+		if self.running:
+			self.thread.saveImageFactor = self.saveImageShrinkBox.value()
+
 	def changeGain(self):
 		if self.running:
 			self.thread.gain = self.gainBox.value()

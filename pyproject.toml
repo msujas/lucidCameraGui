@@ -15,11 +15,6 @@ description = "A GUI for running a LucidVision camera"
 readme = {file = "README.MD", content-type = "text/markdown"}
 keywords = ["Lucid Vision", "ArenaView", "gui"]
 classifiers = [
-"Development Status :: 4 - Beta",
-"Programming Language :: Python :: 3.8",
-"Programming Language :: Python :: 3.9",
-"Programming Language :: Python :: 3.10",
-"Programming Language :: Python :: 3.11",
 "Programming Language :: Python :: 3.12"]
 
 [project.scripts]
