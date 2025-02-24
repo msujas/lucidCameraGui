@@ -33,7 +33,7 @@ def shrinkImageSave(filename, array, factor):
 	lenx = array.shape[1]
 	newy = int(leny/(factor**0.5))
 	newx = int(lenx/(factor**0.5))
-	resize = cv2.resize(array,(newy,newx))
+	resize = cv2.resize(array,(newx,newy))
 	cv2.imwrite(filename, resize)
 
 
