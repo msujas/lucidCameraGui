@@ -468,7 +468,7 @@ class Ui_MainWindow(object):
 		#self.aspectInfoLabel.setGeometry(QtCore.QRect(box1x, int(2.7*boxOffset + box1pos[1]), 201, 41))
 		self.aspectInfoLabel.setFont(smallLabelfont)
 		self.aspectInfoLabel.setObjectName("aspectInfoLabel")
-		self.gridLayout.addWidget(self.aspectInfoLabel, 6,0)
+		self.gridLayout.addWidget(self.aspectInfoLabel, 6,0, 1,2)
 
 		self.colourBox = QtWidgets.QComboBox() #select colour format
 		#self.colourBox.setGeometry(QtCore.QRect(box1x, int(3.5*boxOffset + box1pos[1]),*boxDimensions))
