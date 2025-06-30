@@ -263,7 +263,7 @@ class Worker(QtCore.QThread):
 					currentTime = time.time()
 					if currentTime - self.imageCountDown >= self.imageTime:
 						self.saveImage(resize)
-						self.totalImageTime -= (currentTime - self.imageCountDown)/60
+						self.totalImageTime -= self.imageTime/60
 						if self.totalImageTime <= 0:
 							self.totalImageTime = 0
 							self.imageSeries = False
