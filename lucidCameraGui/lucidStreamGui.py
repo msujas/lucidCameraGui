@@ -966,6 +966,7 @@ class Ui_MainWindow(object):
 		if self.running:
 			self.thread.imageSeries = True
 			self.thread.imageTime = self.imageSeriesTime.value()
+			self.thread.totalImageTime = self.imageSeriesTotalTime.value()
 			self.thread.imageCountDown = 0
 			self.imageSeriesButton.setEnabled(False)
 			self.imageSeriesStopButton.setEnabled(True)
