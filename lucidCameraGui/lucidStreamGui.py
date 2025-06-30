@@ -708,6 +708,7 @@ class Ui_MainWindow(object):
 		self.openDirectoryButton.setObjectName("openDirectoryButton")
 		self.openDirectoryButton.setFont(boxfont)
 		self.openDirectoryButton.setText('...')
+		self.openDirectoryButton.setMaximumWidth(int(30*scaling))
 		self.gridLayout.addWidget(self.openDirectoryButton, 21,2)
 
 		self.directoryLabel = QtWidgets.QLabel(self.centralwidget)
@@ -868,6 +869,7 @@ class Ui_MainWindow(object):
 		oy = self.yOffsetBox.value()
 		monitorx = self.monitorxBox.value()
 		monitory = self.monitoryBox.value()
+		totalImageTime = self.imageSeriesTotalTime.value()
 		if self.manualFPSBox.currentText() == 'True':		
 			manualfps = True		
 		elif self.manualFPSBox.currentText() == 'False':
@@ -886,7 +888,7 @@ class Ui_MainWindow(object):
 		self.thread = Worker(width = width,height = height,ox = ox,oy = oy, monitorx = monitorx,monitory = monitory,
 		manualfps = manualfps,fps = fps,gainAuto = gainAuto,gain = gain, fmt = colourFormat, screenwidth = self.screenwidth, screenheight=self.screenheight,
 		crosssize = crosssize,crossOffsetH = crossOffsetH, crossOffsetW = crossOffsetW, crossCheck = crossCheck, imageTime = imageTime, 
-		imageDir = self.snapshotDir,lineCheck=self.lineCheckBox.isChecked(), linePosition=self.linePositionBox.value(), 
+		imageDir = self.snapshotDir, totalImageTime=totalImageTime,lineCheck=self.lineCheckBox.isChecked(), linePosition=self.linePositionBox.value(), 
 		imageSaveFactor=self.saveImageShrinkBox.value())
 
 		self.thread.start()
