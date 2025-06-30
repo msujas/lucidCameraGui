@@ -50,7 +50,7 @@ class parAttributes():
 		
 
 class Worker(QtCore.QThread):
-	output = QtCore.pyqtSignal(int)
+	output = QtCore.pyqtSignal(tuple)
 	def __init__(self,width: int, height: int, ox: int, oy: int,monitorx: int, monitory: int,manualfps: bool,fps: int, gainAuto: str, 
 	gain: float, fmt: str, screenwidth: int, screenheight: int, crosssize: int, crossOffsetH: int, crossOffsetW: int, crossCheck: bool, linePosition: int, 
 	imageTime: int, imageDir: str, totalImageTime : int,  lineCheck: bool = True, imageSaveFactor = 1):
@@ -263,10 +263,11 @@ class Worker(QtCore.QThread):
 					currentTime = time.time()
 					if currentTime - self.imageCountDown >= self.imageTime:
 						self.saveImage(resize)
-						self.totalImageTime -= currentTime - self.imageCountDown
-						if self.totalImageTime < 0:
+						self.totalImageTime -= (currentTime - self.imageCountDown)/60
+						if self.totalImageTime <= 0:
 							self.totalImageTime = 0
-						self.output.emit(int(self.totalImageTime))
+							self.imageSeries = False
+						self.output.emit((int(self.totalImageTime), self.imageSeries))
 						self.imageCountDown = time.time()
 					
 
@@ -893,7 +894,15 @@ class Ui_MainWindow(object):
 
 		self.thread.start()
 		self.runButton.setEnabled(False)
-		self.thread.output.connect(self.imageSeriesTotalTime.setValue)
+		self.thread.output.connect(self.imageTimer)
+
+	def imageTimer(self, values):
+		newtime = values[0]
+		seriesState = values[1]
+		self.imageSeriesTotalTime.setValue(newtime)
+		self.imageSeriesButton.setEnabled(not seriesState)
+		self.imageSeriesStopButton.setEnabled(seriesState)
+
 
 	def stop_worker(self):
 		self.thread.stop()
