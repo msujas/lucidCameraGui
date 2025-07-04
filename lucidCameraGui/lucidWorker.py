@@ -239,17 +239,13 @@ class Worker(QtCore.QObject):
 							self.imageSeries = False
 						self.output.emit((int(self.totalImageTime), self.imageSeries))
 						self.imageCountDown = time.time()
-					
-
 						
 				self.imageoutput.emit(resize)
-				#cv2.imshow(windowName,resize)
-
 				"""
 				Destroy the copied item to prevent memory leaks
 				"""
 				BufferFactory.destroy(item)
-				#cycletimes = np.append(cycletimes,curr_frame_time-prev_frame_time)
+
 				if frameCount >= fpsCheckFreq:
 					timeCheck = time.time() - t0
 					fps = fpsCheckFreq/timeCheck
@@ -263,18 +259,11 @@ class Worker(QtCore.QObject):
 				prev_frame_time = curr_frame_time
 				frameCount += 1
 
-				"""
-				Break if esc key is pressed
-				"""
-
 
 			device.stop_stream()
-			#cv2.destroyAllWindows()
 
 		system.destroy_device()
-		#print(1/np.average(buffertimes))
-		#cycletimes = cycletimes[1:]
-		#print(f'fps = {1/np.average(cycletimes)}, standard deviation = {np.std(1/cycletimes)}')
+
 		print(f'fps = {totalFPS}')
 		return
 

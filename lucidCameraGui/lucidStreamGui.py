@@ -664,47 +664,47 @@ class Ui_MainWindow(object):
 		
 	def changeImageSaveFactor(self):
 		if self.running:
-			self.thread.saveImageFactor = self.saveImageShrinkBox.value()
+			self.worker.saveImageFactor = self.saveImageShrinkBox.value()
 
 	def changeGain(self):
 		if self.running:
-			self.thread.gain = self.gainBox.value()
-			self.thread.gaincheck = True
+			self.worker.gain = self.gainBox.value()
+			self.worker.gaincheck = True
 	def crossSizeChange(self):
 		if self.running:
-			self.thread.crosssize = self.crossSizeBox.value()
+			self.worker.crosssize = self.crossSizeBox.value()
 	def crossHChange(self):
 		if self.running:
-			self.thread.crossOffsetH = self.crossOffsetHBox.value()
+			self.worker.crossOffsetH = self.crossOffsetHBox.value()
 
 	def crossWChange(self):
 		if self.running:
-			self.thread.crossOffsetW = self.crossOffsetWBox.value()
+			self.worker.crossOffsetW = self.crossOffsetWBox.value()
 	
 	def linePositionChange(self):
 		if self.running:
-			self.thread.linePosition = self.linePositionBox.value()
+			self.worker.linePosition = self.linePositionBox.value()
 	
 	def lineCheckChange(self):
 		if self.running:
-			self.thread.lineCheck = self.lineCheckBox.isChecked()
+			self.worker.lineCheck = self.lineCheckBox.isChecked()
 
 	def takeSingleImage(self):
 		if self.running:
-			self.thread.snapshot = True
+			self.worker.snapshot = True
 
 	def takeImageSeries(self):
 		if self.running:
-			self.thread.imageSeries = True
-			self.thread.imageTime = self.imageSeriesTime.value()
-			self.thread.totalImageTime = self.imageSeriesTotalTime.value()
-			self.thread.imageCountDown = 0
+			self.worker.imageSeries = True
+			self.worker.imageTime = self.imageSeriesTime.value()
+			self.worker.totalImageTime = self.imageSeriesTotalTime.value()
+			self.worker.imageCountDown = 0
 			self.imageSeriesButton.setEnabled(False)
 			self.imageSeriesStopButton.setEnabled(True)
 
 	def stopImageSeries(self):
 		if self.running:
-			self.thread.imageSeries = False
+			self.worker.imageSeries = False
 			self.imageSeriesButton.setEnabled(True)
 			self.imageSeriesStopButton.setEnabled(False)
 	def crossDisplayCheck(self):
@@ -717,7 +717,7 @@ class Ui_MainWindow(object):
 
 	def changeCrossDisplay(self):
 		if self.running:
-			self.thread.crossCheck = self.crossCheckBox.isChecked()
+			self.worker.crossCheck = self.crossCheckBox.isChecked()
 
 
 
@@ -731,7 +731,7 @@ class Ui_MainWindow(object):
 			#f.close()
 			self.updateConfigLog()
 			if self.running:
-				self.thread.imageDir = folder
+				self.worker.imageDir = folder
 	def updateConfigLog(self):
 		self.updateParamDct()
 		logUpdate = ''
