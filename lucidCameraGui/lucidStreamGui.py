@@ -630,7 +630,8 @@ class Ui_MainWindow(object):
 		self.imageSeriesStopButton.setEnabled(seriesState)
 
 	def showImage(self,image):
-		cv2.imshow(self.windowName, image)
+		if self.running:
+			cv2.imshow(self.windowName, image)
 
 	def stop_worker(self):
 		self.worker.stop()
