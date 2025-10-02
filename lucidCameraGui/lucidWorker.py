@@ -76,7 +76,8 @@ class Worker(QtCore.QObject):
 			self.nodevice.emit()
 			return
 		nodemap = device.nodemap
-		nodes = nodemap.get_node(['Width', 'Height', 'PixelFormat','OffsetX','OffsetY', 'AcquisitionFrameRateEnable', 'AcquisitionFrameRate','GainAuto', 'Gain'])
+		nodes = nodemap.get_node(['Width', 'Height', 'PixelFormat','OffsetX','OffsetY', 
+							'AcquisitionFrameRateEnable', 'AcquisitionFrameRate','GainAuto', 'Gain'])
 
 		pixelFormats =	{'Mono8':1, 'Mono10':1, 'Mono10p':1, 'Mono10Packed':1, 'Mono12':1, 'Mono12p':1,
 		'Mono12Packed':1, 'Mono16':1, 'BayerRG8':1, 'BayerRG10':1, 'BayerRG10p':1, 'BayerRG10Packed':1,
