@@ -6,5 +6,5 @@ Options include selecting the camera resolution, offsets (if using lower than ma
 
 ![image](https://github.com/user-attachments/assets/d438c38f-f29c-4640-9e90-72d1aa2383ee)
 
-
+<img width="735" height="551" alt="image" src="https://github.com/user-attachments/assets/76867bfb-d764-4092-9fb6-ad9d39a63b92" />
 
