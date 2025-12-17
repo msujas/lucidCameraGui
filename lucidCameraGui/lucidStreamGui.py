@@ -37,9 +37,9 @@ class parAttributes():
 			return self.param.text()
 
 		
-class Ui_MainWindow(object):
-	def setupUi(self, MainWindow):
-		MainWindow.setObjectName("Lucid GUI")
+class Ui_MainWindow(QtWidgets.QMainWindow):
+	def setupUi(self):
+		self.setObjectName("Lucid GUI")
 
 		self.screen = QtWidgets.QApplication.primaryScreen().size()
 		self.screenwidth = self.screen.width()
@@ -56,8 +56,8 @@ class Ui_MainWindow(object):
 			monydefault = 900
 		scaling = (self.screenwidth/1920)**0.5 #scaling box and font sizes for different screen resolutions
 		windowsize = [int(280*scaling),int(700*scaling)]
-		MainWindow.resize(*windowsize)
-		MainWindow.move(0,self.screenheight - windowsize[1] - 75)
+		self.resize(*windowsize)
+		self.move(0,self.screenheight - windowsize[1] - 75)
 		box1pos = [int(20*scaling), int(35*scaling)]
 		boxDimensions = [int(80*scaling),int(22*scaling)]
 		boxOffset = boxDimensions[1] + int(18*scaling)
@@ -72,7 +72,7 @@ class Ui_MainWindow(object):
 		
 		basefont = int(12*scaling)
 
-		self.centralwidget = QtWidgets.QWidget(MainWindow)
+		self.centralwidget = QtWidgets.QWidget()
 		self.centralwidget.setObjectName("centralwidget")
 
 
@@ -463,15 +463,15 @@ class Ui_MainWindow(object):
 		self.lineCheckBox.stateChanged.connect(self.updateConfigLog)
 		self.gridLayout.addWidget(self.lineCheckBox, 23,1)
 
-		MainWindow.setCentralWidget(self.centralwidget)
-		MainWindow.setCentralWidget(self.centralwidget)
-		self.menubar = QtWidgets.QMenuBar(MainWindow)
+		self.setCentralWidget(self.centralwidget)
+		self.setCentralWidget(self.centralwidget)
+		self.menubar = QtWidgets.QMenuBar()
 		self.menubar.setGeometry(QtCore.QRect(0, 0, 234, 21))
 		self.menubar.setObjectName("menubar")
-		MainWindow.setMenuBar(self.menubar)
-		self.statusbar = QtWidgets.QStatusBar(MainWindow)
+		self.setMenuBar(self.menubar)
+		self.statusbar = QtWidgets.QStatusBar()
 		self.statusbar.setObjectName("statusbar")
-		MainWindow.setStatusBar(self.statusbar)
+		self.setStatusBar(self.statusbar)
 
 
 		self.manualFPSBox.addItem('False')
@@ -485,8 +485,8 @@ class Ui_MainWindow(object):
 		self.colourBox.addItem('Mono8')
 
 		self.centralwidget.setLayout(self.gridLayout)
-		self.retranslateUi(MainWindow)
-		QtCore.QMetaObject.connectSlotsByName(MainWindow)
+		self.retranslateUi()
+		QtCore.QMetaObject.connectSlotsByName(self)
 
 		self.running = False
 		self.monitorxBox.setKeyboardTracking(False)
@@ -536,9 +536,9 @@ class Ui_MainWindow(object):
 		if os.path.exists(self.settingsLog):
 			self.readConfigLog()
 
-	def retranslateUi(self, MainWindow):
+	def retranslateUi(self):
 		_translate = QtCore.QCoreApplication.translate
-		MainWindow.setWindowTitle(_translate("MainWindow", "Lucid GUI"))
+		self.setWindowTitle(_translate("MainWindow", "Lucid GUI"))
 		self.runButton.setText(_translate("MainWindow", "Let\'s gooooo!"))
 
 		self.xResLabel.setText(_translate("MainWindow", "x-resolution"))
@@ -643,6 +643,7 @@ class Ui_MainWindow(object):
 		self.snapShotButton.setEnabled(False)
 		self.imageSeriesButton.setEnabled(False)
 		self.imageSeriesStopButton.setEnabled(False)
+		self.thread.wait()
 		self.running = False
 
 	def updateParamDct(self):
@@ -759,13 +760,17 @@ class Ui_MainWindow(object):
 			elif type(self.paramDct[parname][0]) == QtWidgets.QCheckBox:
 				self.paramDct[parname][0].setChecked(stringToBool(parvalue))
 		self.updateParamDct()
+	def closeEvent(self, a0):
+		if self.running:
+			self.stop_worker()
+		return super().closeEvent(a0)
 
 def main():
 	app = QtWidgets.QApplication(sys.argv)
-	MainWindow = QtWidgets.QMainWindow()
+	#MainWindow = QtWidgets.QMainWindow()
 	ui = Ui_MainWindow()
-	ui.setupUi(MainWindow)
-	MainWindow.show()
+	ui.setupUi()
+	ui.show()
 	sys.exit(app.exec())
 if __name__ == "__main__":
 	main()
