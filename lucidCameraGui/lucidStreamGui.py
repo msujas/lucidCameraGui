@@ -15,7 +15,15 @@ import time
 from datetime import datetime
 from pathlib import Path
 import os, sys
+import argparse
 
+
+def parseargs():
+	ap = argparse.ArgumentParser()
+	ap.add_argument('--host', type=str, default=None)
+	ap.add_argument('-p','--port', type=int,default=None)
+	args = ap.parse_args()
+	return args.host, args.port
 
 def stringToBool(string):
 	if string == 'True':
@@ -47,7 +55,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 		self.gridLayout = QtWidgets.QGridLayout()
 
-
+		self.imagehost,self.imageport = parseargs()
 		if self.screenheight > 2000:
 			monydefault = 2000
 		elif self.screenheight > 1400:
@@ -594,9 +602,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		manualfps = manualfps,fps = fps,gainAuto = gainAuto,gain = gain, fmt = colourFormat, screenwidth = self.screenwidth, screenheight=self.screenheight,
 		crosssize = crosssize,crossOffsetH = crossOffsetH, crossOffsetW = crossOffsetW, crossCheck = crossCheck, imageTime = imageTime, 
 		imageDir = self.snapshotDir, totalImageTime=totalImageTime,lineCheck=self.lineCheckBox.isChecked(), linePosition=self.linePositionBox.value(), 
-		imageSaveFactor=self.saveImageShrinkBox.value())
-
-		
+		imageSaveFactor=self.saveImageShrinkBox.value(), imageserverhost=self.imagehost, imageserverport=self.imageport)		
 		
 		self.thread = QtCore.QThread()
 		self.worker.moveToThread(self.thread)
