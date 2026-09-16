@@ -383,16 +383,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 
 		self.saveImageShrinkBox = QtWidgets.QSpinBox()
-		#self.saveImageShrinkBox.setGeometry(QtCore.QRect(int(box2x + 10*scaling), int(12.8*boxOffset + box1pos[1]), int(50*scaling), boxDimensions[1]))
 		self.saveImageShrinkBox.setFont(labelfont)
 		self.saveImageShrinkBox.setObjectName("saveImageShrinkBox")
 		self.saveImageShrinkBox.setProperty('value',1)
 		self.saveImageShrinkBox.setMinimum(1)
 		self.saveImageShrinkBox.setMaximum(10)
+		self.saveImageShrinkBox.setToolTip('reduces the saved image resolution by a factor of the given value.'
+									 'e.g. 2 gives an image of half the size of 1, 1 is the full size.')
 		self.gridLayout.addWidget(self.saveImageShrinkBox, 19,1)
 		
 		self.saveImageShrinkLabel = QtWidgets.QLabel()
-		#self.saveImageShrinkLabel.setGeometry(QtCore.QRect(int(box2x + 70*scaling), int(12.8*boxOffset + box1pos[1]), int(60*scaling), int(40*scaling)))
 		self.saveImageShrinkLabel.setFont(labelfont)
 		self.saveImageShrinkLabel.setObjectName("saveImageShrinkLabel")
 		self.saveImageShrinkLabel.setText('save image\nshrink factor')
@@ -400,7 +400,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.gridLayout.addWidget(self.saveImageShrinkLabel, 19,2)
 
 		self.imageSeriesStopButton = QtWidgets.QPushButton()
-		#self.imageSeriesStopButton.setGeometry(QtCore.QRect(box1x, int(12.8*boxOffset + box1pos[1]), int(130*scaling), int(40*scaling)))
 		self.imageSeriesStopButton.setFont(labelfont)
 		self.imageSeriesStopButton.setObjectName("imageSeriesStopButton")
 		self.imageSeriesStopButton.setText('stop image series')
@@ -409,14 +408,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.gridLayout.addWidget(self.imageSeriesStopButton, 19,0)
 
 		self.directoryBox = QtWidgets.QLineEdit()
-		#self.directoryBox.setGeometry(QtCore.QRect(box1x, int(box1pos[1]+14*boxOffset),int(boxDimensions[0]*2),boxDimensions[1]))
 		self.directoryBox.setObjectName("directoryBox")
 		self.directoryBox.setFont(boxfont)
 		self.directoryBox.setText(self.snapshotDir)
 		self.gridLayout.addWidget(self.directoryBox, 21,0, 1,2)
 
 		self.openDirectoryButton = QtWidgets.QPushButton(self.centralwidget)
-		#self.openDirectoryButton.setGeometry(QtCore.QRect(int(box1x + 10*scaling + boxDimensions[0]*2), int(box1pos[1]+14*boxOffset),boxDimensions[1],boxDimensions[1]))
 		self.openDirectoryButton.setObjectName("openDirectoryButton")
 		self.openDirectoryButton.setFont(boxfont)
 		self.openDirectoryButton.setText('...')
@@ -424,7 +421,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.gridLayout.addWidget(self.openDirectoryButton, 21,2)
 
 		self.directoryLabel = QtWidgets.QLabel(self.centralwidget)
-		#self.directoryLabel.setGeometry(QtCore.QRect(box1x, int(box1pos[1]+13.65*boxOffset),int(boxDimensions[0]*2),boxDimensions[1]))
 		self.directoryLabel.setObjectName('directoryLabel')
 		self.directoryLabel.setText('image directory')
 		self.directoryLabel.setFont(labelfont)
@@ -432,7 +428,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.gridLayout.addWidget(self.directoryLabel, 20,0)
 
 		self.linePositionLabel = QtWidgets.QLabel(self.centralwidget)
-		#self.linePositionLabel.setGeometry(QtCore.QRect(box1x, int(14.7*boxOffset + box1pos[1]),*boxDimensions))
 		self.linePositionLabel.setObjectName('linePositionLabel')
 		self.linePositionLabel.setText('line position')
 		self.linePositionLabel.setFont(labelfont)
@@ -440,7 +435,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.gridLayout.addWidget(self.linePositionLabel, 22,0)
 
 		self.linePositionBox =	 QtWidgets.QSpinBox() #select the size of the cross that is overlayed on the image
-		#self.linePositionBox.setGeometry(QtCore.QRect(box1x, 15*boxOffset + box1pos[1],*boxDimensions))
 		self.linePositionBox.setObjectName("linePositionBox")
 		self.linePositionBox.setFont(boxfont)
 		self.linePositionBox.setMinimum(0)
@@ -453,7 +447,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.gridLayout.addWidget(self.linePositionBox, 23,0)
 
 		self.lineCheckBox =  QtWidgets.QCheckBox(self.centralwidget) #select whether or not to display the cross
-		#self.lineCheckBox.setGeometry(QtCore.QRect(labelxpos, 15*boxOffset + box1pos[1],int(10*scaling),int(10*scaling)))
 		self.lineCheckBox.setObjectName('lineCheckBox')
 		self.lineCheckBox.setText('display line?')
 		self.lineCheckBox.setFont(labelfont)
@@ -767,7 +760,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 def main():
 	app = QtWidgets.QApplication(sys.argv)
-	#MainWindow = QtWidgets.QMainWindow()
 	ui = Ui_MainWindow()
 	ui.setupUi()
 	ui.show()

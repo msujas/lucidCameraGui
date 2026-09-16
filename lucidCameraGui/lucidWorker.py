@@ -6,6 +6,13 @@ from arena_api.system import system
 from arena_api.buffer import *
 import ctypes
 from datetime import datetime
+try:
+	from capillaryaligner import ImageClient
+	startimageclient = True
+except ImportError:
+	print('capillary aligner not available, not using')
+	startimageclient = False
+
 
 def shrinkImageSave(filename, array, factor):
 	leny = array.shape[0]
@@ -22,7 +29,7 @@ class Worker(QtCore.QObject):
 	nodevice = QtCore.pyqtSignal()
 	def __init__(self,width: int, height: int, ox: int, oy: int,monitorx: int, monitory: int,manualfps: bool,fps: int, gainAuto: str, 
 	gain: float, fmt: str, screenwidth: int, screenheight: int, crosssize: int, crossOffsetH: int, crossOffsetW: int, crossCheck: bool, linePosition: int, 
-	imageTime: int, imageDir: str, totalImageTime : int,  lineCheck: bool = True, imageSaveFactor = 1):
+	imageTime: int, imageDir: str, totalImageTime : int,  lineCheck: bool = True, imageSaveFactor = 1, imageserverhost = None, imageserverport=None):
 		super(Worker,self).__init__()
 		self.width = width
 		self.height = height
@@ -50,6 +57,12 @@ class Worker(QtCore.QObject):
 		self.lineCheck = lineCheck
 		self.saveImageFactor = imageSaveFactor
 		self.totalImageTime = totalImageTime
+		self.imageserverhost = imageserverhost
+		self.imageserverport = imageserverport
+		self.doimageclient = False
+		if startimageclient and self.imageserverhost and self.imageserverport:
+			self.imageclient = ImageClient(self.imageserverhost, self.imageserverport)
+			self.doimageclient=True
 
 	def run(self):
 		tries = 0
@@ -170,6 +183,7 @@ class Worker(QtCore.QObject):
 			t0 = time.time()
 			totalFPS = 0
 			fpsCheckFreq = 10
+			servertime = time.time()
 			while self.running:
 				# Used to display FPS on stream
 				curr_frame_time = time.time()
@@ -240,12 +254,17 @@ class Worker(QtCore.QObject):
 							self.imageSeries = False
 						self.output.emit((int(self.totalImageTime), self.imageSeries))
 						self.imageCountDown = time.time()
-						
+				if self.doimageclient and time.time() - servertime > 5:
+					try:
+						self.imageclient.sendimage(resize)
+					except TimeoutError:
+						print(f"couldn't find image server {self.imageserverhost}:{self.imageserverport}, stopping requests")
+						self.doimageclient = False
+
+					servertime = time.time()
 				self.imageoutput.emit(resize)
-				"""
-				Destroy the copied item to prevent memory leaks
-				"""
-				BufferFactory.destroy(item)
+				
+				BufferFactory.destroy(item) #Destroy the copied item to prevent memory leaks
 
 				if frameCount >= fpsCheckFreq:
 					timeCheck = time.time() - t0
