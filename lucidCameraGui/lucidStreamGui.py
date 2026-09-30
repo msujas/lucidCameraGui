@@ -56,8 +56,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		
 
 		self.imagehost,self.imageport = parseargs()
-		self.imagehost = QHostAddress(self.imagehost)
-		self.lucidserver = LucidServer(self.processServer, self.imagehost, self.imageport, self)
+		if not self.imagehost or not self.imageport:
+			self.lucidserver = None
+		else:
+			self.imagehost = QHostAddress(self.imagehost)
+			self.lucidserver = LucidServer(self.processServer, self.imagehost, self.imageport, self)
 		if self.screenheight > 2000:
 			monydefault = 2000
 		elif self.screenheight > 1400:
@@ -470,12 +473,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 		self.serverhostlabel = QtWidgets.QLabel()
 		self.serverhostlabel.setObjectName("serverhostlabel")
-		self.serverhostlabel.setText("server host: ")
+		self.serverhostlabel.setText(f"server host: {self.imagehost}")
 		self.gridLayout.addWidget(self.serverhostlabel, 24,0)
 
 		self.portlabel = QtWidgets.QLabel()
 		self.portlabel.setObjectName("serverhostlabel")
-		self.portlabel.setText("server port: ")
+		self.portlabel.setText(f"server port: {self.imageport}")
 		self.gridLayout.addWidget(self.portlabel,24,1)
 
 		self.setCentralWidget(self.centralwidget)
