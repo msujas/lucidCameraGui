@@ -308,8 +308,10 @@ class Worker(QtCore.QObject):
 			shrinkImageSave(filename, array,self.saveImageFactor)
 		try:
 			cv2.imwrite(filename, array)
+			print(f'image saved to {filename}')
 		except FileExistsError:
 			print("directory not found")
 			return
 		except PermissionError:
 			print(f"no permission to save in {self.imageDir}")
+		
