@@ -473,7 +473,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 		self.serverhostlabel = QtWidgets.QLabel()
 		self.serverhostlabel.setObjectName("serverhostlabel")
-		self.serverhostlabel.setText(f"server host: {self.imagehost.toString()}")
+		if self.imagehost is None:
+			hstring = 'None'
+		else:
+			hstring = self.imagehost.toString()
+		self.serverhostlabel.setText(f"server host: {hstring}")
 		self.gridLayout.addWidget(self.serverhostlabel, 24,0)
 
 		self.portlabel = QtWidgets.QLabel()
