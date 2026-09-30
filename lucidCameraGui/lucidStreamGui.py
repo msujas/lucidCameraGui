@@ -804,7 +804,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 			sock.write(self.byteimage)
 		elif data == validcommands[2]:
 			self.worker.snapshot = True
-			sock.write("ok!")
+			sock.write(b"ok!")
 
 
 def main():
