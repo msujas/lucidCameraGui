@@ -1,7 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .lucidWorker import Worker
 from .lucidserver import LucidServer, PORT
-from PyQt6.QtNetwork import QTcpSocket
+from PyQt6.QtNetwork import QTcpSocket, QHostAddress
 from arena_api.system import system
 from arena_api.buffer import *
 import arena_api.enums as enums
@@ -56,7 +56,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		
 
 		self.imagehost,self.imageport = parseargs()
-
+		self.imagehost = QHostAddress(self.imagehost)
 		self.lucidserver = LucidServer(self.processServer, self.imagehost, self.imageport, self)
 		if self.screenheight > 2000:
 			monydefault = 2000

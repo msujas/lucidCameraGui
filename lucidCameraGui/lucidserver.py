@@ -15,8 +15,9 @@ class LucidServer(QTcpServer):
         
     def _onConnection(self):
         sock = self.nextPendingConnection()
-        data = sock.readAll().data().decode()
-        confunc = partial(self.handler, data, sock)
-        sock.readyRead.connect(confunc)
+        def onready():
+            data = sock.readAll().data().decode()
+            self.handler( data, sock)
+        sock.readyRead.connect(onready)
         sock.disconnected.connect(sock.deleteLater)
 
