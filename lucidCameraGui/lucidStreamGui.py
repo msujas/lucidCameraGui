@@ -801,8 +801,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 			if self.byteimage is None:
 				sock.write(b"no image stored currently!")
 				return
+			print('sending image from server')
 			sock.write(self.byteimage)
 		elif data == validcommands[2]:
+			print('snapshot request from client')
 			self.worker.snapshot = True
 			sock.write(b"ok!")
 
