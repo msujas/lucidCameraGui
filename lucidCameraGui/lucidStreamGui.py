@@ -19,7 +19,7 @@ from capillaryaligner.imageencoding import encodeimage
 def parseargs():
 	ap = argparse.ArgumentParser()
 	ap.add_argument('--host', type=str, default=None)
-	ap.add_argument('-p','--port', type=int,default=None)
+	ap.add_argument('-p','--port', type=int,default=PORT)
 	args = ap.parse_args()
 	return args.host, args.port
 
