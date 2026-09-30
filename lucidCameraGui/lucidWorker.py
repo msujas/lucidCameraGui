@@ -306,5 +306,10 @@ class Worker(QtCore.QObject):
 		filename = f'{self.imageDir}/{dt.year}_{dt.month:02d}_{dt.day:02d}_{dt.hour:02d}{dt.minute:02d}{dt.second:02d}.png'
 		if self.saveImageFactor > 1:
 			shrinkImageSave(filename, array,self.saveImageFactor)
-		else:
+		try:
 			cv2.imwrite(filename, array)
+		except FileExistsError:
+			print("directory not found")
+			return
+		except PermissionError:
+			print(f"no permission to save in {self.imageDir}")

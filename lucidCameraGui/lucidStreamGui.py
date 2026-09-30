@@ -593,6 +593,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.stopButton.setEnabled(True)
 		self.snapShotButton.setEnabled(True)
 		self.imageSeriesButton.setEnabled(True)
+		self.snapshotDir = self.directoryBox.text()
 		width = self.xResBox.value()
 		height = self.yResBox.value()
 		ox = self.xOffsetBox.value()
