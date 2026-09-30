@@ -793,11 +793,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		
 	def processServer(self, data, sock:QTcpSocket):
 		validcommands = ["save!", "request!", "snapshot!"]
+		notrunningstr = b"camera not running!"
 		if data not in validcommands:
 			print(f'error. Received data: {data}')
 			sock.write(b"invalid request!")
 			return
 		if data == validcommands[0]:
+			if not self.running:
+				sock.write(notrunningstr)
+				return
 			print('saving image')
 			self.worker.sendimage = True
 			sock.write(b"ok!")
@@ -809,6 +813,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 			print('sending image from server')
 			sock.write(self.byteimage)
 		elif data == validcommands[2]:
+			if not self.running:
+				sock.write(notrunningstr)
+				return
 			print('snapshot request from client')
 			self.worker.snapshot = True
 			sock.write(b"ok!")
