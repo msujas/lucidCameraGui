@@ -1,9 +1,7 @@
-# Created by: PyQt5 UI code generator 5.9.2
-
-
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .lucidWorker import Worker
-
+from .lucidserver import LucidServer, PORT
+from PyQt6.QtNetwork import QTcpSocket
 from arena_api.system import system
 from arena_api.buffer import *
 import arena_api.enums as enums
@@ -16,7 +14,7 @@ from datetime import datetime
 from pathlib import Path
 import os, sys
 import argparse
-
+from capillaryaligner.imageencoding import encodeimage
 
 def parseargs():
 	ap = argparse.ArgumentParser()
@@ -55,13 +53,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 		self.gridLayout = QtWidgets.QGridLayout()
 
+		
+
 		self.imagehost,self.imageport = parseargs()
+
+		self.lucidserver = LucidServer(self.processServer, self.imagehost, self.imageport, self)
 		if self.screenheight > 2000:
 			monydefault = 2000
 		elif self.screenheight > 1400:
 			monydefault = 1300
 		else:
 			monydefault = 900
+		self.getbyteimage = False
+		self.byteimage = None
 		scaling = (self.screenwidth/1920)**0.5 #scaling box and font sizes for different screen resolutions
 		windowsize = [int(280*scaling),int(700*scaling)]
 		self.resize(*windowsize)
@@ -454,7 +458,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.linePositionBox.valueChanged.connect(self.updateConfigLog)
 		self.gridLayout.addWidget(self.linePositionBox, 23,0)
 
-		self.lineCheckBox =  QtWidgets.QCheckBox(self.centralwidget) #select whether or not to display the cross
+		self.lineCheckBox =  QtWidgets.QCheckBox() #select whether or not to display the cross
 		self.lineCheckBox.setObjectName('lineCheckBox')
 		self.lineCheckBox.setText('display line?')
 		self.lineCheckBox.setFont(labelfont)
@@ -463,6 +467,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.lineCheckBox.stateChanged.connect(self.lineCheckChange)
 		self.lineCheckBox.stateChanged.connect(self.updateConfigLog)
 		self.gridLayout.addWidget(self.lineCheckBox, 23,1)
+
+		self.serverhostlabel = QtWidgets.QLabel()
+		self.serverhostlabel.setObjectName("serverhostlabel")
+		self.serverhostlabel.setText("server host: ")
+		self.gridLayout.addWidget(self.serverhostlabel, 24,0)
+
+		self.portlabel = QtWidgets.QLabel()
+		self.portlabel.setObjectName("serverhostlabel")
+		self.portlabel.setText("server port: ")
+		self.gridLayout.addWidget(self.portlabel,24,1)
 
 		self.setCentralWidget(self.centralwidget)
 		self.setCentralWidget(self.centralwidget)
@@ -611,6 +625,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.worker.imagesizeoutput.connect(self.createCVwindow)
 		self.worker.output.connect(self.imageTimer)
 		self.worker.imageoutput.connect(self.showImage)
+		self.worker.sendbyteimage.connect(self.getimage)
 		self.thread.start()
 		self.runButton.setEnabled(False)
 	
@@ -763,6 +778,31 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		if self.running:
 			self.stop_worker()
 		return super().closeEvent(a0)
+
+	def getimage(self, byteimage):
+		self.byteimage = byteimage
+		return byteimage
+		
+	def processServer(self, data, sock:QTcpSocket):
+		validcommands = ["save!", "request!", "snapshot!"]
+		if data not in validcommands:
+			print(f'error. Received data: {data}')
+			sock.write(b"invalid request!")
+			return
+		if data == validcommands[0]:
+			print('saving image')
+			self.worker.sendimage = True
+			sock.write(b"ok!")
+			return
+		elif data == validcommands[1]:
+			if self.byteimage is None:
+				sock.write(b"no image stored currently!")
+				return
+			sock.write(self.byteimage)
+		elif data == validcommands[2]:
+			self.worker.snapshot = True
+			sock.write("ok!")
+
 
 def main():
 	app = QtWidgets.QApplication(sys.argv)

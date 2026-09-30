@@ -1,0 +1,22 @@
+from PyQt6.QtNetwork import QTcpServer, QHostAddress, QTcpSocket
+from capillaryaligner.imageencoding import encodeimage, decodeimage
+from capillaryaligner.imageserver import ImageServer
+from PyQt6 import QtCore
+from functools import partial
+
+PORT = 51678
+class LucidServer(QTcpServer):
+    def __init__(self, handler, host, port:int=PORT, parent = None):
+        super().__init__(parent)
+        self.handler = handler
+        self.newConnection.connect(self._onConnection)
+        self.listen(host, port)
+        self.image = None
+        
+    def _onConnection(self):
+        sock = self.nextPendingConnection()
+        data = sock.readAll().data().decode()
+        confunc = partial(self.handler, data, sock)
+        sock.readyRead.connect(confunc)
+        sock.disconnected.connect(sock.deleteLater)
+

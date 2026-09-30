@@ -6,6 +6,8 @@ from arena_api.system import system
 from arena_api.buffer import *
 import ctypes
 from datetime import datetime
+from capillaryaligner.imageencoding import encodeimage
+
 try:
 	from capillaryaligner import ImageClient
 	startimageclient = True
@@ -27,6 +29,7 @@ class Worker(QtCore.QObject):
 	imagesizeoutput = QtCore.pyqtSignal(tuple)
 	imageoutput = QtCore.pyqtSignal(np.ndarray)
 	nodevice = QtCore.pyqtSignal()
+	sendbyteimage = QtCore.pyqtSignal(bytes)
 	def __init__(self,width: int, height: int, ox: int, oy: int,monitorx: int, monitory: int,manualfps: bool,fps: int, gainAuto: str, 
 	gain: float, fmt: str, screenwidth: int, screenheight: int, crosssize: int, crossOffsetH: int, crossOffsetW: int, crossCheck: bool, linePosition: int, 
 	imageTime: int, imageDir: str, totalImageTime : int,  lineCheck: bool = True, imageSaveFactor = 1, imageserverhost = None, imageserverport=None):
@@ -60,6 +63,7 @@ class Worker(QtCore.QObject):
 		self.imageserverhost = imageserverhost
 		self.imageserverport = imageserverport
 		self.doimageclient = False
+		self.sendimage = False
 		if startimageclient and self.imageserverhost and self.imageserverport:
 			self.imageclient = ImageClient(self.imageserverhost, self.imageserverport)
 			self.doimageclient=True
@@ -254,6 +258,7 @@ class Worker(QtCore.QObject):
 							self.imageSeries = False
 						self.output.emit((int(self.totalImageTime), self.imageSeries))
 						self.imageCountDown = time.time()
+				'''
 				if self.doimageclient and time.time() - servertime > 5:
 					try:
 						self.imageclient.sendimage(resize)
@@ -262,6 +267,10 @@ class Worker(QtCore.QObject):
 						self.doimageclient = False
 
 					servertime = time.time()
+				'''
+				if self.sendimage:
+					self.sendbyteimage(encodeimage(resize))
+					self.sendimage = False
 				self.imageoutput.emit(resize)
 				
 				BufferFactory.destroy(item) #Destroy the copied item to prevent memory leaks
