@@ -269,7 +269,7 @@ class Worker(QtCore.QObject):
 					servertime = time.time()
 				'''
 				if self.sendimage:
-					self.sendbyteimage(encodeimage(resize))
+					self.sendbyteimage.emit(encodeimage(resize))
 					self.sendimage = False
 				self.imageoutput.emit(resize)
 				
