@@ -794,7 +794,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		notrunningstr = b"camera not running!"
 		sendok = partial(sock.write, b"ok!")
 		if data not in validcommands:
-			print(f'error. Received data: {data}')
+			print(f'error. Received data: {data} from {sock.peerName()}:{sock.peerPort()}')
 			sock.write(b"invalid request!")
 			return
 		if data == validcommands[0]:
@@ -809,7 +809,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 			if self.byteimage is None:
 				sock.write(b"no image stored currently!")
 				return
-			print('sending image from server')
+			print(f'sending image from server to {sock.peerName()}:{sock.peerPort()}')
 			sock.write(self.byteimage)
 		elif data == validcommands[2]:
 			if not self.running:
