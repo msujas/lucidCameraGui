@@ -783,6 +783,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 	def getimage(self, byteimage):
 		self.byteimage = byteimage
+		print('new image stored as byte string')
 		return byteimage
 		
 	def processServer(self, data, sock:QTcpSocket):
