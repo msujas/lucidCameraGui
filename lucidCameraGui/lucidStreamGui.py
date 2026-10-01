@@ -38,6 +38,7 @@ class parAttributes():
 
 		
 class Ui_MainWindow(QtWidgets.QMainWindow):
+	newbyteimage = QtCore.pyqtSignal()
 	def setupUi(self):
 		self.setObjectName("Lucid GUI")
 
@@ -783,6 +784,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 	def getimage(self, byteimage):
 		self.byteimage = byteimage
+		self.newbyteimage.emit()
 		print('new image stored as byte string')
 		return byteimage
 		
@@ -799,7 +801,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 				return
 			print('saving image')
 			self.worker.sendimage = True
-			sock.write(b"ok!")
+			self.newbyteimage.connect(sock.write(b"ok!"),QtCore.Qt.ConnectionType.SingleShotConnection,)
 			return
 		elif data == validcommands[1]:
 			if self.byteimage is None:

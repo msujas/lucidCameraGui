@@ -50,12 +50,12 @@ class LucidClient():
         print(f'asking server to save an image at {self.host}:{self.port}')
         return self.multiClient(b'save!')
 
-    def requestnewimage(self):
+    def requestnewimage(self, waittime = 2):
         '''
         asks server to save a new image, then requests the stored image
         '''
         self.saverequest()
-        time.sleep(1) #give time to encode image
+        time.sleep(waittime) #give time to encode image
         return self.requestimage()
 
     def takesnapshot(self):
