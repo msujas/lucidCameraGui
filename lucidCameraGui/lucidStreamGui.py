@@ -3,6 +3,7 @@ from .lucidWorker import Worker
 from .lucidserver import LucidServer, PORT
 from PyQt6.QtNetwork import QTcpSocket, QHostAddress
 from arena_api.buffer import *
+from functools import partial
 
 import numpy as np
 import cv2
@@ -791,6 +792,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 	def processServer(self, data, sock:QTcpSocket):
 		validcommands = ["save!", "request!", "snapshot!"]
 		notrunningstr = b"camera not running!"
+		sendok = partial(sock.write, b"ok!")
 		if data not in validcommands:
 			print(f'error. Received data: {data}')
 			sock.write(b"invalid request!")
@@ -801,7 +803,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 				return
 			print('saving image')
 			self.worker.sendimage = True
-			self.newbyteimage.connect(sock.write(b"ok!"),QtCore.Qt.ConnectionType.SingleShotConnection,)
+			self.newbyteimage.connect(sendok,QtCore.Qt.ConnectionType.SingleShotConnection,)
 			return
 		elif data == validcommands[1]:
 			if self.byteimage is None:
