@@ -71,6 +71,11 @@ class LucidClient():
         plt.imshow(image)
         plt.show()
         return image
+    
+    def plotnewimage(self):
+        self.saverequest()
+        time.sleep(0.1)
+        return self.plotimage()
 
 
     def multiClient(self,message):
