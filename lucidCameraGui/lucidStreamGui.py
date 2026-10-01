@@ -4,6 +4,7 @@ from .lucidserver import LucidServer, PORT
 from PyQt6.QtNetwork import QTcpSocket, QHostAddress
 from arena_api.buffer import *
 from functools import partial
+import socket
 
 import numpy as np
 import cv2
@@ -793,8 +794,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		validcommands = ["save!", "request!", "snapshot!"]
 		notrunningstr = b"camera not running!"
 		sendok = partial(sock.write, b"ok!")
+		hostip = sock.peerAddress().toString()
+		hostname = socket.gethostbyaddr(hostip)[0]
 		if data not in validcommands:
-			print(f'error. Received data: {data} from {sock.peerName()}:{sock.peerPort()}')
+			print(f'error. Received data: {data} from {hostname}:{sock.peerPort()}')
 			sock.write(b"invalid request!")
 			return
 		if data == validcommands[0]:
@@ -809,7 +812,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 			if self.byteimage is None:
 				sock.write(b"no image stored currently!")
 				return
-			print(f'sending image from server to {sock.peerName()}:{sock.peerPort()}')
+			print(f'sending image from server to {hostname}:{sock.peerPort()}')
 			sock.write(self.byteimage)
 		elif data == validcommands[2]:
 			if not self.running:
