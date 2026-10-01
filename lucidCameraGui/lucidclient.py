@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import cv2
 import time
 import os
-logger = logging.Logger()
+logger = logging.getLogger()
 home = pathlib.Path.home()
 
 class LucidClient():
@@ -18,7 +18,7 @@ class LucidClient():
         self.port = port
         self.connid = connid
         
-        logfile = f'{home}/.config/microscopeserverlog/client.log'
+        logfile = f'{home}/.config/lucidlog/client.log'
         os.makedirs(os.path.dirname(logfile),exist_ok=True)
         loglevel = logging.INFO
 
