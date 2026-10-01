@@ -50,14 +50,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 		self.gridLayout = QtWidgets.QGridLayout()
 
-		
-
 		self.imagehost,self.imageport = parseargs()
 		if not self.imagehost or not self.imageport:
 			self.lucidserver = None
 		else:
-			self.imagehost = QHostAddress(self.imagehost)
+			self.imagehost = QHostAddress(socket.gethostbyname(self.imagehost))
 			self.lucidserver = LucidServer(self.processServer, self.imagehost, self.imageport, self)
+
 		if self.screenheight > 2000:
 			monydefault = 2000
 		elif self.screenheight > 1400:

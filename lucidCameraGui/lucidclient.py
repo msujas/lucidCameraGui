@@ -63,6 +63,9 @@ class LucidClient():
         return self.multiClient(b'snapshot!')
 
     def plotimage(self, dpi = 150):
+        '''
+        requests current image from server, then plots it
+        '''
         image = self.requestimage()
         if image is None:
             return   
@@ -72,10 +75,13 @@ class LucidClient():
         plt.show()
         return image
     
-    def plotnewimage(self):
+    def plotnewimage(self, dpi = 150):
+        '''
+        asks server to save new image, then requests image and plots it
+        '''
         self.saverequest()
         time.sleep(0.1)
-        return self.plotimage()
+        return self.plotimage(dpi=dpi)
 
 
     def multiClient(self,message):
