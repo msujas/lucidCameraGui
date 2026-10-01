@@ -1,8 +1,4 @@
-from PyQt6.QtNetwork import QTcpServer, QHostAddress, QTcpSocket
-from capillaryaligner.imageencoding import encodeimage, decodeimage
-from capillaryaligner.imageserver import ImageServer
-from PyQt6 import QtCore
-from functools import partial
+from PyQt6.QtNetwork import QTcpServer
 
 PORT = 51678
 class LucidServer(QTcpServer):

@@ -6,7 +6,7 @@ from arena_api.system import system
 from arena_api.buffer import *
 import ctypes
 from datetime import datetime
-from capillaryaligner.imageencoding import encodeimage
+from .imageencoding import encodeimage
 
 try:
 	from capillaryaligner import ImageClient

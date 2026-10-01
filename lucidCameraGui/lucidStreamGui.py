@@ -2,19 +2,13 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from .lucidWorker import Worker
 from .lucidserver import LucidServer, PORT
 from PyQt6.QtNetwork import QTcpSocket, QHostAddress
-from arena_api.system import system
 from arena_api.buffer import *
-import arena_api.enums as enums
 
-import ctypes
 import numpy as np
 import cv2
-import time
-from datetime import datetime
 from pathlib import Path
 import os, sys
 import argparse
-from capillaryaligner.imageencoding import encodeimage
 
 def parseargs():
 	ap = argparse.ArgumentParser()
@@ -651,7 +645,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		self.imageSeriesButton.setEnabled(not seriesState)
 		self.imageSeriesStopButton.setEnabled(seriesState)
 
-	def showImage(self,image):
+	def showImage(self,image:np.ndarray):
 		if self.running:
 			cv2.imshow(self.windowName, image)
 
