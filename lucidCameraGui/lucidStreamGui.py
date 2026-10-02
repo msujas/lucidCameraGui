@@ -785,8 +785,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 	def getimage(self, byteimage):
 		self.byteimage = byteimage
-		self.newbyteimage.emit()
 		print('new image stored as byte string')
+		self.newbyteimage.emit()
 		return byteimage
 		
 	def processServer(self, data, sock:QTcpSocket):
@@ -829,7 +829,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 			if not self.running:
 				sock.write(notrunningstr)
 				return
-			print(f'saving and sending image to {hostname}:{sock.peerPort()}')
+			print(f'request to save and send image from {hostname}:{sock.peerPort()}')
 			self.worker.sendimage = True
 			self.newbyteimage.connect(waitimagesend,QtCore.Qt.ConnectionType.SingleShotConnection,)
 
