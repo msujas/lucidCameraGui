@@ -50,7 +50,11 @@ class LucidClient():
         print(f'asking server to save an image at {self.host}:{self.port}')
         return self.multiClient(b'save!')
 
-    def requestnewimage(self, waittime = 0.1):
+    def requestnewimage(self):
+        data = self.multiClient(b"requestnew!")
+        return decodeimage(data)
+
+    def requestnewimage_old(self, waittime = 0.1):
         '''
         asks server to save a new image, then requests the stored image
         '''

@@ -790,11 +790,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		return byteimage
 		
 	def processServer(self, data, sock:QTcpSocket):
-		validcommands = ["save!", "request!", "snapshot!"]
+		validcommands = ["save!", "request!", "snapshot!", "requestnew!"]
 		notrunningstr = b"camera not running!"
 		sendok = partial(sock.write, b"ok!")
 		hostip = sock.peerAddress().toString()
 		hostname = socket.gethostbyaddr(hostip)[0]
+		sendingimagestr = f'sending image from server to {hostname}:{sock.peerPort()}'
+		def waitimagesend():
+			print(sendingimagestr)
+			sock.write(self.byteimage)
+
 		if data not in validcommands:
 			print(f'error. Received data: {data} from {hostname}:{sock.peerPort()}')
 			sock.write(b"invalid request!")
@@ -811,7 +816,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 			if self.byteimage is None:
 				sock.write(b"no image stored currently!")
 				return
-			print(f'sending image from server to {hostname}:{sock.peerPort()}')
+			print(sendingimagestr)
 			sock.write(self.byteimage)
 		elif data == validcommands[2]:
 			if not self.running:
@@ -820,6 +825,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 			print('snapshot request from client')
 			self.worker.snapshot = True
 			sock.write(b"ok!")
+		elif data == validcommands[3]:
+			if not self.running:
+				sock.write(notrunningstr)
+				return
+			print(f'saving and sending image to {hostname}:{sock.peerPort()}')
+			self.worker.sendimage = True
+			self.newbyteimage.connect(waitimagesend,QtCore.Qt.ConnectionType.SingleShotConnection,)
 
 
 def main():
