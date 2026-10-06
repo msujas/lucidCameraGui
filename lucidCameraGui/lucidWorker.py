@@ -30,6 +30,7 @@ class Worker(QtCore.QObject):
 	imageoutput = QtCore.pyqtSignal(np.ndarray)
 	nodevice = QtCore.pyqtSignal()
 	sendbyteimage = QtCore.pyqtSignal(bytes)
+	imagefilename = QtCore.pyqtSignal(str)
 	def __init__(self,width: int, height: int, ox: int, oy: int,monitorx: int, monitory: int,manualfps: bool,fps: int, gainAuto: str, 
 	gain: float, fmt: str, screenwidth: int, screenheight: int, crosssize: int, crossOffsetH: int, crossOffsetW: int, crossCheck: bool, linePosition: int, 
 	imageTime: int, imageDir: str, totalImageTime : int,  lineCheck: bool = True, imageSaveFactor = 1, imageserverhost = None, imageserverport=None):
@@ -308,6 +309,7 @@ class Worker(QtCore.QObject):
 			shrinkImageSave(filename, array,self.saveImageFactor)
 		try:
 			cv2.imwrite(filename, array)
+			self.imagefilename.emit(filename)
 			print(f'image saved to {filename}')
 		except FileExistsError:
 			print("directory not found")

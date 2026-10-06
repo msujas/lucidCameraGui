@@ -799,6 +799,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 		def waitimagesend():
 			print(sendingimagestr)
 			sock.write(self.byteimage)
+		def waitsnapshot(fname:str):
+			print(f'sending snapshot file name to {hostname}:{sock.peerPort()}')
+			fnameb = fname.encode()
+			sock.write(fnameb)
 
 		if data not in validcommands:
 			print(f'error. Received data: {data} from {hostname}:{sock.peerPort()}')
@@ -824,7 +828,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 				return
 			print('snapshot request from client')
 			self.worker.snapshot = True
-			sock.write(b"ok!")
+			#sock.write(b"ok!")
+			self.worker.imagefilename.connect(waitsnapshot, QtCore.Qt.ConnectionType.SingleShotConnection,)
 		elif data == validcommands[3]:
 			if not self.running:
 				sock.write(notrunningstr)

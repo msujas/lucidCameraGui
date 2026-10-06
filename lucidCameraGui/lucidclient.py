@@ -64,7 +64,7 @@ class LucidClient():
 
     def takesnapshot(self):
         print(f'asking server to take snapshot at {self.host}:{self.port}')
-        return self.multiClient(b'snapshot!')
+        return self.multiClient(b'snapshot!').decode()
 
     def plotimage(self, dpi = 150):
         '''
@@ -137,7 +137,8 @@ class LucidClient():
                     receivedMessage+= recv_data
                     data.recv_total += len(recv_data)
 
-                if not recv_data or IMAGEENDSTRING in receivedMessage or receivedMessage in possibleresponses:
+                if not recv_data or IMAGEENDSTRING in receivedMessage or receivedMessage in possibleresponses or \
+                receivedMessage.endswith(b'.png'):
                     print(f"Closing connection {data.connid}")
                     sel.unregister(sock)
                     sock.close()
