@@ -128,7 +128,7 @@ class LucidClient():
         sock = key.fileobj
         data = key.data
         receivedMessage = b''
-        possibleresponses = [b'ok!', b'invalid request!',b"no image stored currently!", b"camera not running!"]
+        possibleresponses = [b'ok!', b'invalid request!',b"no image stored currently!", b"camera not running!", b"snapshot error!"]
         if mask & selectors.EVENT_READ:
             while True:
                 recv_data = sock.recv(1024)  # Should be ready to read

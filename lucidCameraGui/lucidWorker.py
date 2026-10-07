@@ -303,6 +303,7 @@ class Worker(QtCore.QObject):
 		#self.terminate()
 
 	def saveImage(self, array):
+		errormessage = 'snapshot error!'
 		dt = datetime.fromtimestamp(time.time())
 		filename = f'{self.imageDir}/{dt.year}_{dt.month:02d}_{dt.day:02d}_{dt.hour:02d}{dt.minute:02d}{dt.second:02d}.png'
 		if self.saveImageFactor > 1:
@@ -313,7 +314,9 @@ class Worker(QtCore.QObject):
 			print(f'image saved to {filename}')
 		except FileExistsError:
 			print("directory not found")
+			self.imagefilename.emit(errormessage)
 			return
 		except PermissionError:
 			print(f"no permission to save in {self.imageDir}")
+			self.imagefilename.emit(errormessage)
 		
