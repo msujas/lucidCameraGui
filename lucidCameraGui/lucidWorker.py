@@ -259,16 +259,7 @@ class Worker(QtCore.QObject):
 							self.imageSeries = False
 						self.output.emit((int(self.totalImageTime), self.imageSeries))
 						self.imageCountDown = time.time()
-				'''
-				if self.doimageclient and time.time() - servertime > 5:
-					try:
-						self.imageclient.sendimage(resize)
-					except TimeoutError:
-						print(f"couldn't find image server {self.imageserverhost}:{self.imageserverport}, stopping requests")
-						self.doimageclient = False
-
-					servertime = time.time()
-				'''
+						
 				if self.sendimage:
 					self.sendbyteimage.emit(encodeimage(resize))
 					self.sendimage = False
