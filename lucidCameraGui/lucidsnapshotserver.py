@@ -21,7 +21,7 @@ def parseargs():
     ap.add_argument('--lport',type = int,default=PORT, help=f'lucid server port (default {PORT})')
     #ap.add_argument('--username',type=str,help = 'username on Lucid camera PC (needed to copy snapshots over)',required=True)
     args = ap.parse_args()
-    return args.host, args.port, args.lhost, args.lport, args.username
+    return args.host, args.port, args.lhost, args.lport
 
 class LucidExportServer():
     def __init__(self):
