@@ -5,6 +5,7 @@ import argparse, subprocess, os
 from PIL import Image
 import time
 from datetime import datetime
+import cv2
 
 EPORT = 56737
 
@@ -32,15 +33,10 @@ class LucidExportServer():
     async def mainloop(self, localdir, waittime):
         try:
             while True:
-                '''
-                outfile = self.lclient.takesnapshot()
-                cmd = ['scp',f'{self.username}@{self.lhost}:{outfile}', f'{localdir}/']
-                subprocess.run(cmd)
-                '''
                 array = self.lclient.requestnewimage()
                 outfile = f'{localdir}/{getdtstring()}.png'
                 print(f'saving {outfile}')
-                im = Image.fromarray(array)
+                im = Image.fromarray(cv2.cvtColor(array, cv2.COLOR_BGR2RGB))
                 im.save(outfile)
                 await asyncio.sleep(waittime)
         except asyncio.CancelledError:
