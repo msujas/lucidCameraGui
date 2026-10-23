@@ -12,7 +12,12 @@ class LucidSnapshotClient():
         return s.recv(1024).decode()
     def runexporter(self, dirname, waittime):
         data = self.sendmessage(f'run {dirname}|{waittime}')
-        return data
+        print(data)
+        status = self.getstatus()
+        print(status)
+        if 'not running' in status:
+            print('check Lucid server and camera are running')
+        return status
     def stopexporter(self):
         data = self.sendmessage('stop')
         return data

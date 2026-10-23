@@ -46,6 +46,8 @@ class LucidExportServer():
         except TimeoutError | AttributeError:
             print('no data returned. Check Lucid server is running')
             raise asyncio.CancelledError
+        except:
+            print('error. Loop stopped')
 
     def is_running(self):
         return self.looptask is not None and not self.looptask.done()
