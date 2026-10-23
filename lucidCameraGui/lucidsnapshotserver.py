@@ -2,8 +2,16 @@ import asyncio
 from .lucidserver import PORT
 from .lucidclient import LucidClient
 import argparse, subprocess, os
+from PIL import Image
+import time
+from datetime import datetime
 
 EPORT = 56737
+
+def getdtstring():
+    t = time.time()
+    dt = datetime.fromtimestamp()
+    return f'{dt.year:04d}{dt.month:02d}{dt.day:02d}_{dt.hour:02d}{dt.minute:02d}{dt.second:02d}'
 
 def parseargs():
     ap = argparse.ArgumentParser()
@@ -24,10 +32,16 @@ class LucidExportServer():
     async def mainloop(self, localdir, waittime):
         try:
             while True:
+                '''
                 outfile = self.lclient.takesnapshot()
                 cmd = ['scp',f'{self.username}@{self.lhost}:{outfile}', f'{localdir}/']
                 subprocess.run(cmd)
-                asyncio.sleep(waittime)
+                '''
+                array = self.lclient.requestimage()
+                outfile = f'{localdir}/{getdtstring()}.png'
+                im = Image.fromarray(array)
+                im.save(outfile)
+                await asyncio.sleep(waittime)
         except asyncio.CancelledError:
             print('main loop stopped')
             raise
