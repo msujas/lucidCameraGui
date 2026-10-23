@@ -19,6 +19,7 @@ classifiers = [
 
 [project.scripts]
 lucidCameraGUI = "lucidCameraGui.lucidStreamGui:main"
+lucidsnapshotserver = 'lucidCameraGui.lucidsnapshotserver:main'
 
 [tool.setuptools]
 packages = ["lucidCameraGui"]
