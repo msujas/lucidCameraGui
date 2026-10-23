@@ -28,6 +28,7 @@ class LucidExportServer():
     def __init__(self):
         self.host,self.port,self.lhost,self.lport = parseargs()
         self.lclient = LucidClient(self.lhost,self.lport)
+        print(f'Using Lucid server at {self.lhost}:{self.lport}')
         self.looptask: asyncio.Task | None = None
         self.shutdownevent = asyncio.Event()
     async def mainloop(self, localdir, waittime):
@@ -42,6 +43,9 @@ class LucidExportServer():
         except asyncio.CancelledError:
             print('main loop stopped')
             raise
+        except TimeoutError | AttributeError:
+            print('no data returned. Check Lucid server is running')
+            raise asyncio.CancelledError
 
     def is_running(self):
         return self.looptask is not None and not self.looptask.done()
