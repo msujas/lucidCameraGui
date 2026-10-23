@@ -10,7 +10,7 @@ EPORT = 56737
 
 def getdtstring():
     t = time.time()
-    dt = datetime.fromtimestamp()
+    dt = datetime.fromtimestamp(t)
     return f'{dt.year:04d}{dt.month:02d}{dt.day:02d}_{dt.hour:02d}{dt.minute:02d}{dt.second:02d}'
 
 def parseargs():
@@ -19,13 +19,13 @@ def parseargs():
     ap.add_argument('--port',type = int, default=EPORT, help= f'export server port (default {EPORT})')
     ap.add_argument('--lhost',type = str, help='Lucid server host', required=True)
     ap.add_argument('--lport',type = int,default=PORT, help=f'lucid server port (default {PORT})')
-    ap.add_argument('--username',type=str,help = 'username on Lucid camera PC (needed to copy snapshots over)',required=True)
+    #ap.add_argument('--username',type=str,help = 'username on Lucid camera PC (needed to copy snapshots over)',required=True)
     args = ap.parse_args()
     return args.host, args.port, args.lhost, args.lport, args.username
 
 class LucidExportServer():
     def __init__(self):
-        self.host,self.port,self.lhost,self.lport , self.username= parseargs()
+        self.host,self.port,self.lhost,self.lport = parseargs()
         self.lclient = LucidClient(self.lhost,self.lport)
         self.looptask: asyncio.Task | None = None
         self.shutdownevent = asyncio.Event()
@@ -37,8 +37,9 @@ class LucidExportServer():
                 cmd = ['scp',f'{self.username}@{self.lhost}:{outfile}', f'{localdir}/']
                 subprocess.run(cmd)
                 '''
-                array = self.lclient.requestimage()
+                array = self.lclient.requestnewimage()
                 outfile = f'{localdir}/{getdtstring()}.png'
+                print(f'saving {outfile}')
                 im = Image.fromarray(array)
                 im.save(outfile)
                 await asyncio.sleep(waittime)
